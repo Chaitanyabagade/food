@@ -1,13 +1,12 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Tailwind CSS Directives */
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* @tailwind base: Resets and global styles */
+@tailwind base;
+
+/* @tailwind components: Tailwind components (e.g., button, form) */
+@tailwind components;
+
+/* @tailwind utilities: All of Tailwind’s utility classes (e.g., padding, margin, colors) */
+@tailwind utilities;
+
+/* You can also add custom styles here if needed */
