@@ -30,7 +30,7 @@ const Signup = () => {
   const handleSendOtp = () => {
     if (formData.email) {
       setSpinner(1);
-      const url2 = `https://darkslategray-lion-860323.hostingersite.com/smart-agri/software/user/SendOtp.php`;
+      const url2 = `${process.env.REACT_APP_domain}food/user/SendOtp.php`;
       let fData = new FormData();
       fData.append('email', formData.email);
       axios.post(url2, fData).then((response) => {
@@ -71,7 +71,7 @@ const Signup = () => {
     }
     else {
       setSpinner(1);
-      const url2 = `https://darkslategray-lion-860323.hostingersite.com/smart-agri/software/user/SignUp.php`;
+      const url2 = `${process.env.REACT_APP_domain}food/user/SignUp.php`;
       let fData = new FormData();
       fData.append('firstName', formData.firstName);
       fData.append('lastName', formData.lastName);

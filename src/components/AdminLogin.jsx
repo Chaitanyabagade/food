@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-const Login = () => {
+const AdminLogin = () => {
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(0);
   const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ const Login = () => {
     }
     else {
       setSpinner(1);
-      const url2 = `${process.env.REACT_APP_domain}food/user/Login.php`;
+      const url2 = `https://darkslategray-lion-860323.hostingersite.com/smart-agri/software/user/Login.php`;
       let fData = new FormData();
       fData.append('email', email);
       fData.append('password', password);
@@ -31,7 +31,7 @@ const Login = () => {
           Cookies.set('userId', APIResponse.userId, { expires: 30 });
           Cookies.set('firstName', APIResponse.firstName, { expires: 30 });
           Cookies.set('lastName', APIResponse.lastName, { expires: 30 });
-          
+          Cookies.set('noOfMNodes', APIResponse.noOfMNodes, { expires: 30 });
           toast.success("Login Successful...");
           setTimeout(() => {
             navigate('/');
@@ -59,7 +59,7 @@ const Login = () => {
         height: "100vh", // Full viewport height
       }}>
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Admin Login</h2>
 
         <div className="space-y-6 text-xl">
           {/* Loading Spinner */}
@@ -101,9 +101,7 @@ const Login = () => {
 
           {/* Forgot Password Link */}
           <div className="flex justify-between text-lg">
-          <div className="">
-            <Link to="/Signup" className=" text-blue-500 hover:underline">Sign Up</Link>
-          </div>
+          
           <div className="text-right">
             <Link to="#forgot-password" className=" text-blue-500 hover:underline">Forgot Password?</Link>
           </div>
@@ -123,4 +121,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;
