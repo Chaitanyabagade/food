@@ -110,7 +110,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                 <button onClick={toggleCart} className="text-gray-600 hover:text-green-600 relative ml-[40px] mt-[3px] flex">
                     <FiShoppingCart className="w-8 h-8" />
                     <div className="items font-bold mt-[20px] w-[30px] h-[30px] text-center rounded-full border-2 border-gray-400">
-                        {cartItems.length}
+                    {cartItems.reduce((acc, item) => acc + item.qty, 0)}
                     </div>
                 </button>
             </div>
