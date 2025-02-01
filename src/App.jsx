@@ -36,7 +36,7 @@ function App() {
                 <AdminNav />
               
                 <Routes>
-                    <Route path="/" element={<Recomended />} /> 
+                  
 
                   
                 </Routes>
@@ -57,7 +57,7 @@ function App() {
             <>  {/* user dashboard */}
               <TaskBar />
               <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Recomended />} /> 
                    
                 </Routes>
             </>
