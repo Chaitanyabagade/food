@@ -96,8 +96,8 @@ function App() {
 
 
   useEffect(() => {
-
-    if (cartItems.length || flagDataget) {
+    
+    if (flagDataget) {
       saveCartData();
     }
     // eslint-disable-next-line
