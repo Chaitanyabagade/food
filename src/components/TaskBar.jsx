@@ -4,17 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { FiShoppingCart } from "react-icons/fi"; // Import cart icon
 
-const TaskBar = () => {
+const TaskBar = ({cartItems,setCartItemsfunction }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false); // State to toggle cart box
     const navigate = useNavigate();
 
-    // Dummy cart items for illustration
-    const [cartItems, setCartItems] = useState([
-        { id: 1, name: "Burger", qty: 2, price: 5.99 },
-        { id: 2, name: "Fries", qty: 1, price: 2.99 },
-        { id: 3, name: "Soda", qty: 3, price: 1.49 },
-    ]);
 
     const toggleCart = () => {
         setIsCartOpen(!isCartOpen);
@@ -27,7 +21,7 @@ const TaskBar = () => {
             }
             return item;
         });
-        setCartItems(updatedCart);
+        setCartItemsfunction(updatedCart);
     };
 
     const decreaseQty = (id) => {
@@ -37,12 +31,12 @@ const TaskBar = () => {
             }
             return item;
         });
-        setCartItems(updatedCart);
+        setCartItemsfunction(updatedCart);
     };
 
     const removeItem = (id) => {
         const updatedCart = cartItems.filter(item => item.id !== id);
-        setCartItems(updatedCart);
+        setCartItemsfunction(updatedCart);
     };
 
     const saveToCard = () => {
@@ -161,7 +155,7 @@ const TaskBar = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="text-right px-2 py-1 text-sm text-gray-600">${item.price.toFixed(2)}</td>
+                                    <td className="text-right px-2 py-1 text-sm text-gray-600">{item.price}</td>
                                     <td className="text-right px-2 py-1 text-sm text-gray-600">
                                         <button 
                                             onClick={() => removeItem(item.id)}
@@ -177,7 +171,7 @@ const TaskBar = () => {
                     <div className="mt-4 flex justify-between items-center">
                         <span className="font-semibold text-lg text-gray-800">Total:</span>
                         <span className="font-semibold text-lg text-gray-800">
-                            ${cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)}
+                            {cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)}
                         </span>
                     </div>
                     <div className="mt-4 flex space-x-4">

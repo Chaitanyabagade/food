@@ -15,6 +15,30 @@ import TaskBar from './components/TaskBar';
 import AdminNav from './components/AdminNav';
 import Recomended from './components/Recomended';
 function App() {
+  // Dummy cart items for illustration
+  const [cartItems, setCartItems] = useState([]);
+  function setCartItemsfunction(updatedCart) {
+    setCartItems(updatedCart);
+  }
+  function addToCart(id, name, qty, price){
+    // Check if the item already exists in the cart
+    setCartItems((prevCartItems) => {
+      const itemIndex = prevCartItems.findIndex(item => item.id === id);
+
+      if (itemIndex !== -1) {
+        // Item exists, so update the quantity
+        const updatedCartItems = [...prevCartItems];
+        updatedCartItems[itemIndex].qty += qty; // Add to the existing quantity
+        return updatedCartItems;
+      } else {
+        // Item doesn't exist, add a new item to the cart
+        const newItem = { id, name, qty, price };
+        return [...prevCartItems, newItem];
+      }
+    });
+  };
+ //addToCart(10,'naksdf',5,100);
+
   const [isUserloged, setLoged] = useState(0);
   const [isAdmin, setIsAdmin] = useState(0);
   useEffect(() => {
@@ -24,6 +48,7 @@ function App() {
     else if (Cookies.get('email') && Cookies.get('userId')) {
       setLoged(1);
     }
+   
   }, []);
   return (
     <div className="App">
@@ -34,16 +59,16 @@ function App() {
             isAdmin ?
               <>  {/* Admin dashboard */}
                 <AdminNav />
-              
-                <Routes>
-                  
 
-                  
+                <Routes>
+
+
+
                 </Routes>
               </>
               :
               <>
-               {/* by defauld */}
+                {/* by defauld */}
                 <Navbar />
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -55,11 +80,11 @@ function App() {
               </>
             :
             <>  {/* user dashboard */}
-              <TaskBar />
+              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} />
               <Routes>
-                  <Route path="/" element={<Recomended />} /> 
-                   
-                </Routes>
+                <Route path="/" element={<Recomended addToCart={addToCart}/>} />
+
+              </Routes>
             </>
         }
 
