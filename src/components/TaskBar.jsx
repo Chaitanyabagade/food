@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { FiShoppingCart } from "react-icons/fi"; // Import cart icon
 
-const TaskBar = ({cartItems,setCartItemsfunction }) => {
+const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false); // State to toggle cart box
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const TaskBar = ({cartItems,setCartItemsfunction }) => {
     const toggleCart = () => {
         setIsCartOpen(!isCartOpen);
     };
-
+    
     const increaseQty = (id) => {
         const updatedCart = cartItems.map(item => {
             if (item.id === id) {
@@ -40,8 +40,7 @@ const TaskBar = ({cartItems,setCartItemsfunction }) => {
     };
 
     const saveToCard = () => {
-        // Handle save to card logic here (e.g., store the cart items in a database or session)
-        alert("Items saved to the card!");
+        saveCartData();
     };
 
     return (

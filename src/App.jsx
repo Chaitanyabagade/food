@@ -14,13 +14,66 @@ import { useEffect, useState } from 'react';
 import TaskBar from './components/TaskBar';
 import AdminNav from './components/AdminNav';
 import Recomended from './components/Recomended';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 function App() {
-  // Dummy cart items for illustration
+
+  // cart 
   const [cartItems, setCartItems] = useState([]);
+
+  function fetchCartItems() {
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('firstname', Cookies.get('firstName'));
+    formData.append('lastname', Cookies.get('lastName'));
+    formData.append('email', Cookies.get('email'));
+  
+    // Send the FormData using Axios
+    axios.post(`${process.env.REACT_APP_domain}food/user/getCartItems.php`, formData, {
+      withCredentials: true, // Ensure cookies are sent with the request
+    })
+    .then(response => {
+      setCartItems(response.data.cart);
+    })
+    .catch(error => {
+      console.error('Error fetching cart items:', error);
+    });
+  }
+  
+  function saveCartData() {
+    // Create a FormData object
+    const formData = new FormData();
+
+    // Convert jsonData to a Blob and append it
+    const jsonBlob = new Blob([JSON.stringify(cartItems)], { type: 'application/json' });
+    formData.append('jsonData', jsonBlob);
+
+    // Append additional fields
+    formData.append('email',Cookies.get('email') );
+    formData.append('firstname',Cookies.get('firstName') );
+    formData.append('lastname',Cookies.get('lastName') );
+
+    axios.post(`${process.env.REACT_APP_domain}food/user/saveCart.php`, formData)
+      .then(response => {
+        if(response.data.status){
+           toast.success(response.data.message);
+        }
+        else{
+           toast.error(response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+  
+
+
+
   function setCartItemsfunction(updatedCart) {
     setCartItems(updatedCart);
   }
-  function addToCart(id, name, qty, price){
+  function addToCart(id, name, qty, price) {
     // Check if the item already exists in the cart
     setCartItems((prevCartItems) => {
       const itemIndex = prevCartItems.findIndex(item => item.id === id);
@@ -37,7 +90,7 @@ function App() {
       }
     });
   };
- //addToCart(10,'naksdf',5,100);
+  //addToCart(10,'naksdf',5,100);
 
   const [isUserloged, setLoged] = useState(0);
   const [isAdmin, setIsAdmin] = useState(0);
@@ -48,7 +101,7 @@ function App() {
     else if (Cookies.get('email') && Cookies.get('userId')) {
       setLoged(1);
     }
-   
+    fetchCartItems();
   }, []);
   return (
     <div className="App">
@@ -80,9 +133,9 @@ function App() {
               </>
             :
             <>  {/* user dashboard */}
-              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} />
+              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} />
               <Routes>
-                <Route path="/" element={<Recomended addToCart={addToCart}/>} />
+                <Route path="/" element={<Recomended  addToCart={addToCart} />} />
 
               </Routes>
             </>

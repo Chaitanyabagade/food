@@ -71,7 +71,8 @@ const Recomended = ({addToCart}) => {
 
                         <div key={index} className="bg-white p-1 md:p-6 rounded-xl shadow-lg flex flex-col justify-between transform  transition cursor-pointer">
                             <img src={`https://darkslategray-lion-860323.hostingersite.com/food/menuitemimg/${item.image_url}`} alt={item.name} className="w-full object-cover bg-white rounded-lg" />
-                            <h3 className="mt-2 text-xl font-semibold text-gray-700">{item.name}</h3>
+                            <h3 className="mt-1 text-xl font-semibold text-gray-700">{item.name}</h3>
+                            <h3 className="mt-1 text-xl font-semibold text-gray-700">Rs. {item.price}</h3>
                             {/* Buttons aligned at the bottom */}
                             <div className="mt-auto">
                                 <div className="flex items-center justify-center mt-3">
