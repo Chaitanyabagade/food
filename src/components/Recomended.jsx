@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { FcPlus } from "react-icons/fc";
+import { GrFormSubtract } from "react-icons/gr";
 
-const Recomended = ({addToCart}) => {
+const Recomended = ({ addToCart }) => {
     const [menuItems, setMenuItems] = useState([]);
     const [spinner, setSpinner] = useState(0);
     const [menuqty, setMenuqty] = useState([]);
-   
+
     const getMenuItemData = () => {
         const url = `${process.env.REACT_APP_domain}food/getMenuItemData.php`;
         let fData = new FormData();
@@ -21,7 +23,7 @@ const Recomended = ({addToCart}) => {
             })
             .catch(error => toast.error(error, " Try Again...!"), setSpinner(0));
     }
-   
+
     // Function to increase the quantity
     const increaseQuantity = (index) => {
         setMenuqty(prevMenuqty => {
@@ -30,7 +32,7 @@ const Recomended = ({addToCart}) => {
             return updatedMenuqty;
         });
     };
-    
+
     // Function to decrease the quantity but ensure it doesn't go below 1
     const decreaseQuantity = (index) => {
         setMenuqty(prevMenuqty => {
@@ -41,14 +43,14 @@ const Recomended = ({addToCart}) => {
             return updatedMenuqty;
         });
     };
-    
-    function addtoCartfromrecomended(item,index){
-        addToCart(item.item_id,item.name,menuqty[index],item.price);
+
+    function addtoCartfromrecomended(item, index) {
+        addToCart(item.item_id, item.name, menuqty[index], item.price);
     }
 
     useEffect(() => {
         getMenuItemData();
-      
+
     }, []);
 
 
@@ -75,12 +77,15 @@ const Recomended = ({addToCart}) => {
                             <h3 className="mt-1 text-xl font-semibold text-gray-700">Rs. {item.price}</h3>
                             {/* Buttons aligned at the bottom */}
                             <div className="mt-auto">
-                                <div className="flex items-center justify-center mt-3">
-                                    <button onClick={()=>{increaseQuantity(index)}} className="px-3 py-1 bg-red-500 text-white rounded-lg">+</button>
+                                <div className="flex items-center justify-center mt-1">
+
+                                    <button onClick={() => { decreaseQuantity(index) }} className="  text-white rounded-lg">  <GrFormSubtract style={{ color: 'white', background: 'red', borderRadius: '50%', width: '25px', height: '25px', fontWeight: 'bold' }} /></button>
                                     <span className="mx-2 text-lg font-semibold">{menuqty[index]}</span>
-                                    <button onClick={()=>{decreaseQuantity(index)}} className="px-3 py-1 bg-green-500 text-white rounded-lg">-</button>
+                                    <button onClick={() => { increaseQuantity(index) }} className="   text-white rounded-lg"> <FcPlus style={{ width: '30px', height: '30px' }} /></button>
+
+
                                 </div>
-                                <button onClick={()=>{addtoCartfromrecomended(item,index)}} className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg w-full">Add to Cart</button>
+                                <button onClick={() => { addtoCartfromrecomended(item, index) }} className="mt-3 px-4 py-2 my-2 bg-blue-600 text-white rounded-lg w-fit">Add to Cart</button>
                             </div>
                         </div>
                     ))}

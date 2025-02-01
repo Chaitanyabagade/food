@@ -3,7 +3,8 @@ import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { FiShoppingCart } from "react-icons/fi"; // Import cart icon
-
+import { FcPlus } from "react-icons/fc";
+import { GrFormSubtract } from "react-icons/gr";
 const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false); // State to toggle cart box
@@ -22,6 +23,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
             return item;
         });
         setCartItemsfunction(updatedCart);
+        saveToCard();
     };
 
     const decreaseQty = (id) => {
@@ -32,16 +34,19 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
             return item;
         });
         setCartItemsfunction(updatedCart);
+        saveToCard();
     };
 
     const removeItem = (id) => {
         const updatedCart = cartItems.filter(item => item.id !== id);
         setCartItemsfunction(updatedCart);
+        saveCartData();
     };
 
     const saveToCard = () => {
         saveCartData();
     };
+    
 
     return (
         <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
@@ -112,7 +117,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
 
             {/* Cart Box (Visible when cart is toggled) */}
             {isCartOpen && (
-                <div className="absolute top-[60px] right-4 bg-white shadow-lg p-4 rounded-lg w-[320px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
+                <div className="absolute top-[60px] right-2 bg-white shadow-lg p-4 rounded-lg w-[340px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
                     {/* Close Button */}
                     <button 
                         onClick={() => setIsCartOpen(false)} 
@@ -129,7 +134,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                                 <th className="text-left px-2 py-1 text-sm text-gray-600">Product Name</th>
                                 <th className="text-left px-2 py-1 text-sm text-gray-600">Qty</th>
                                 <th className="text-right px-2 py-1 text-sm text-gray-600">Price</th>
-                                <th className="text-right px-2 py-1 text-sm text-gray-600">Actions</th>
+                                <th className="text-right px-2 py-1 text-sm text-gray-600">Act</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -143,14 +148,14 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                                                 onClick={() => decreaseQty(item.id)}
                                                 className="text-red-600 font-bold text-xl"
                                             >
-                                                -
+                                               <GrFormSubtract style={{ color: 'white', background:'red',borderRadius:'50%',width:'18px', height:'18px',fontWeight: 'bold' }} />
                                             </button>
                                             <span className="text-sm">{item.qty}</span>
                                             <button
                                                 onClick={() => increaseQty(item.id)}
                                                 className="text-green-600 font-bold text-xl"
                                             >
-                                                +
+                                               <FcPlus />
                                             </button>
                                         </div>
                                     </td>
@@ -173,17 +178,11 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                             {cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)}
                         </span>
                     </div>
-                    <div className="mt-4 flex space-x-4">
+                    <div className="mt-4 w-full justify-center flex space-x-4">
                         {/* Checkout Button */}
-                        <button className="w-full bg-green-600 text-white py-2 rounded-lg">Checkout</button>
+                        <button className="w-fit px-10 bg-blue-700 text-white py-2 rounded-lg">Checkout</button>
                         
-                        {/* Save to Card Button */}
-                        <button 
-                            onClick={saveToCard} 
-                            className="w-full bg-blue-600 text-white py-2 rounded-lg"
-                        >
-                            Save to Card
-                        </button>
+                      
                     </div>
                 </div>
             )}
