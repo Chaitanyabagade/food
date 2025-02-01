@@ -18,7 +18,7 @@ const AdminLogin = () => {
     }
     else {
       setSpinner(1);
-      const url2 = `https://darkslategray-lion-860323.hostingersite.com/smart-agri/software/user/Login.php`;
+      const url2 = `${process.env.REACT_APP_domain}food/admin/adminLogin.php`;
       let fData = new FormData();
       fData.append('email', email);
       fData.append('password', password);
@@ -27,11 +27,8 @@ const AdminLogin = () => {
         const APIResponse = response.data;// This is response data from AXIOS
         console.log(APIResponse);
         if (APIResponse.status_code === '200' && APIResponse.status === 'success' && APIResponse.message === 'Logged In') {
-          Cookies.set('email', APIResponse.email, { expires: 30 });
-          Cookies.set('userId', APIResponse.userId, { expires: 30 });
-          Cookies.set('firstName', APIResponse.firstName, { expires: 30 });
-          Cookies.set('lastName', APIResponse.lastName, { expires: 30 });
-          Cookies.set('noOfMNodes', APIResponse.noOfMNodes, { expires: 30 });
+          Cookies.set('adminEmail', APIResponse.email, { expires: 30 });
+          Cookies.set('admin', APIResponse.email, { expires: 30 });
           toast.success("Login Successful...");
           setTimeout(() => {
             navigate('/');

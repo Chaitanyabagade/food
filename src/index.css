@@ -10,3 +10,12 @@
 @tailwind utilities;
 
 /* You can also add custom styles here if needed */
+* {
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer & Edge */
+  }
+  
+  *::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+  }
+  

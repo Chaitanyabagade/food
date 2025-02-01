@@ -7,7 +7,7 @@ import homeimg from "../assets/homeimg.jpg"
 import { Link } from "react-router-dom";
 const Home = () => {
     return (
-        <div className="bg-gray-50 min-h-screen font-sans mt-[70px] ">
+        <div className="bg-gray-50 min-h-screen font-sans mt-[65px] ">
             {/* Hero Section */}
             <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px] bg-cover bg-center" style={{ backgroundImage: "url('https://source.unsplash.com/1600x900/?delicious-food')" }}>
                 <div style={{backgroundImage:`url(${homeimg})`,backgroundSize:'cover'}} className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-6">
