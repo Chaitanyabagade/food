@@ -203,9 +203,9 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                         <Link>
                           {
                             !Cookies.get('isBlind')?                         
-                            <button  onClick={()=>{ Cookies.set('isBlind',1, { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                            <button  onClick={()=>{ Cookies.set('isBlind',!Cookies.get('isBlind'), { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
                              :
-                            <button  onClick={()=>{ Cookies.set('isBlind',0, { expires: 30 })}} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                            <button  onClick={()=>{ Cookies.set('isBlind',!Cookies.get('isBlind'), { expires: 30 })}} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
                          }
                             </Link>  
 
