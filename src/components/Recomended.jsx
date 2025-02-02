@@ -8,7 +8,9 @@ const Recomended = ({ addToCart }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
-
+  const [isStrted, setIsStarted] = useState(0);
+  // eslint-disable-next-line
+  const [isBlind, setIsBlind] = useState(1);
   // Fetch menu item data
   const getMenuItemData = () => {
     const url = `${process.env.REACT_APP_domain}food/getMenuItemData.php`;
@@ -63,8 +65,8 @@ const Recomended = ({ addToCart }) => {
   const [isListening, setIsListening] = useState(false);
   // eslint-disable-next-line
   const [currentOrder, setCurrentOrder] = useState({ itemId: "", qty: 0 });
-  const [add, setadd] = useState({});
-  const [responseText, setResponseText] = useState("");
+  const [add, setadd] = useState({itemId:0,itemName:'',itemPrice:0,qty:1});
+
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -95,10 +97,11 @@ const Recomended = ({ addToCart }) => {
     synth.speak(utterance);
   };
 
+
   // Start ordering process
   const startOrdering = () => {
     if (isListening) return;
-    setResponseText("Listening...");
+
     speakWithCallback("Hello! What would you like to add in cart?", "hi-IN", () => {
       startSpeechRecognition("order");
     });
@@ -173,19 +176,39 @@ const Recomended = ({ addToCart }) => {
   const handleOrder = (order) => {
 
     setCurrentOrder((prev) => ({ ...prev, itemId: order }));
-    setResponseText(`You said: "${order}". Is this correct? Say Yes correct, or No Incorrect.`);
-    speakWithCallback(`You said: ${order}. Is this correct? Say Yes correct, or No Incorrect.`, "hi-IN", () => {
-      startSpeechRecognition('iteamconfirmation')
-    });
+    speakWithCallback(`wait... i am checking the item`, "hi-IN");
+  
+    const url = `${process.env.REACT_APP_domain}food/user/checkTheItem.php`;
+    const formData = new FormData();
+    console.log(order);
+    formData.append('product_name', order);
+    axios.post(url, formData)
+      .then((response) => {
+         console.log(response.data);
+         setadd(prevState => ({
+          ...prevState,
+           itemPrice:response.data.price,
+           itemName:response.data.name,
+           itemId:response.data.item_id
+        }));
+        speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes correct, or No Incorrect.`, "hi-IN", () => {
+          startSpeechRecognition('iteamconfirmation');
+        });
+      })
+      .catch(error => {
+        toast.error(error, " Try Again...!");
+        setSpinner(0);
+      });
+  
   };
 
   // Handle confirmation input
   const handleConfirmationofitem = (iteamconfirmation) => {
 
     const lowerConfirm = iteamconfirmation.trim().toLowerCase();
-    if (lowerConfirm.includes("yes")) {
+    if (["yes", "correctt"].some(word => lowerConfirm.includes(word))) {
 
-      setResponseText(`Okay. How much quantity would you like to add?`);
+
       speakWithCallback(`okay. How much quantity would you like to add?`, "hi-IN", () => {
         startSpeechRecognition("quantity");
       });
@@ -194,13 +217,13 @@ const Recomended = ({ addToCart }) => {
         ...prevOrder,
         itemId: ""
       }));
-      setResponseText("Okay, let's try again. What would you like to order?");
-      speakWithCallback("Okay, let's try again. What would you like to order?", "hi-IN", () => {
+
+      speakWithCallback("Okay, let's try again. What would you like to add in cart?", "hi-IN", () => {
         startSpeechRecognition("order");
       });
     } else {
-      setResponseText("Sorry, I didn't understand that. Please say Yes or No. for me");
-      speakWithCallback("Sorry, I didn't understand that. Please say Yes or No. for me", "hi-IN", () => {
+
+      speakWithCallback("Sorry, I didn't understand that. Please say Yes correct, or No Incorrect.", "hi-IN", () => {
 
         startSpeechRecognition("iteamconfirmation");
 
@@ -215,7 +238,7 @@ const Recomended = ({ addToCart }) => {
     const words = cleanText.split(/\s+/);
     let lastWord = words[words.length - 1];
     let number = parseInt(lastWord, 10);
-  
+
     if (isNaN(number)) {
       const numberWords = {
         "one": 1,
@@ -233,18 +256,22 @@ const Recomended = ({ addToCart }) => {
         number = numberWords[lastWord];
       }
     }
-  
+
     if (!isNaN(number) && number > 0) {
       setCurrentOrder((prev) => {
         const updatedOrder = { ...prev, qty: number };
-        setResponseText(`You ordered ${number} of "${updatedOrder.itemId}". Do you want to confirm? (Say Yes or No)`);
-  
+
+
         speakWithCallback(
-          `You ordered ${number} of ${updatedOrder.itemId}. Do you want to confirm? Say yes or no.`,
+          `You want to add ${number} of ${updatedOrder.itemId}. Do you want to confirm? Say yes confirm or no cancel.`,
           "hi-IN",
           () => {
             // Update `add` only after confirmation
-            setadd({ itemId: updatedOrder.itemId, qty: number });
+            setadd(prevState => ({
+              ...prevState,
+              qty:number // Update only itemName
+            }));
+            
             startSpeechRecognition("confirmation");
           }
         );
@@ -256,37 +283,42 @@ const Recomended = ({ addToCart }) => {
       });
     }
   };
-  
-  const [isconfirm,setisconferm]=useState(0);
+
+  const [isconfirm, setisconferm] = useState(0);
   useEffect(() => {
     if (isconfirm) {
-        console.log("suceefully added in cart");
-        speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemId} In your cart.`, "hi-IN");
-        setisconferm(0);
+      speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemId} In your cart.`, "hi-IN");
+      addToCart(add.itemId, add.itemName, add.qty, add.itemPrice);
+     
+      setisconferm(0);
+      setIsStarted(0);
     }
     // eslint-disable-next-line
   }, [isconfirm]);
-  
+
   const handleConfirmation = (confirmation) => {
     const lowerConfirm = confirmation.trim().toLowerCase();
-    if (lowerConfirm.includes("yes")) {
+    if (["yes", "confirm"].some(word => lowerConfirm.includes(word))) {
       setisconferm(1);
-    } else if (lowerConfirm.includes("no")) { 
-      setResponseText("Okay, let's try again. What would you like to order?");
-      speakWithCallback("Okay, let's try again. What would you like to order?", "hi-IN", () => {
+    } else if (["no", "cancel"].some(word => lowerConfirm.includes(word))) {
+
+      speakWithCallback("Okay, let's try again. What would you like to add in cart?", "hi-IN", () => {
         startSpeechRecognition("order");
         setisconferm(0);
       });
     } else {
-      setResponseText("Sorry, I didn't understand that. Please say Yes or No.");
-      speakWithCallback("Sorry, I didn't understand that. Please say Yes or No.", "hi-IN", () => {
-         setisconferm(0);
+
+      speakWithCallback("Sorry, I didn't understand that. Please say Yes Confirm or No cancel.", "hi-IN", () => {
+        setisconferm(0);
         startSpeechRecognition("confirmation");
 
       });
     }
   };
-  
+
+
+
+
 
   /////////////////////////////////////////////////////////////////
 
@@ -314,9 +346,17 @@ const Recomended = ({ addToCart }) => {
           />
         </svg>
       </div>
-      {/* Start Button */}
-      <button onClick={startOrdering}>start</button>
-      <div className="mainbox">{responseText}</div>
+      {
+        isBlind ? <button
+          onClick={() => { !isStrted && startOrdering(); setIsStarted(1) }}
+          onDoubleClick={() => { window.location.reload() }}
+          className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
+             fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          Start
+        </button> :
+          ''
+      }
+
       {/* Menu Items */}
       <div className="container mx-auto py-8 px-6 text-center">
         <h2 className="text-4xl font-bold text-gray-800 mb-8">All Menu</h2>

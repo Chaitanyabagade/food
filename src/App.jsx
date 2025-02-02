@@ -50,7 +50,7 @@ function App() {
     // Convert jsonData to a Blob and append it
     const jsonBlob = new Blob([JSON.stringify(cartItems)], { type: 'application/json' });
     formData.append('jsonData', jsonBlob);
-
+    
     // Append additional fields
     formData.append('email', Cookies.get('email'));
     formData.append('firstname', Cookies.get('firstName'));
