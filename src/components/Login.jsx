@@ -31,7 +31,8 @@ const Login = () => {
           Cookies.set('userId', APIResponse.userId, { expires: 30 });
           Cookies.set('firstName', APIResponse.firstName, { expires: 30 });
           Cookies.set('lastName', APIResponse.lastName, { expires: 30 });
-          
+          Cookies.set('isProfileSet',APIResponse.isProfileSet,{ expires: 30 })
+         
           toast.success("Login Successful...");
           setTimeout(() => {
             navigate('/');

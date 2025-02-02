@@ -10,15 +10,17 @@ import AdminLogin from "./components/AdminLogin"
 import Cookies from 'js-cookie';
 //import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TaskBar from './components/TaskBar';
 import AdminNav from './components/AdminNav';
 import Recomended from './components/Recomended';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import Profile from './components/Profile';
 function App() {
 
   // cart 
+
   const [cartItems, setCartItems] = useState([]);
   const [flagDataget, setFlagDataGet] = useState(0);
   function fetchCartItems() {
@@ -96,13 +98,12 @@ function App() {
 
 
   useEffect(() => {
-    
+
     if (flagDataget) {
       saveCartData();
     }
     // eslint-disable-next-line
   }, [cartItems]);
-
 
   const [isUserloged, setLoged] = useState(0);
   const [isAdmin, setIsAdmin] = useState(0);
@@ -113,7 +114,9 @@ function App() {
     else if (Cookies.get('email') && Cookies.get('userId')) {
       setLoged(1);
     }
+
     fetchCartItems();
+    // eslint-disable-next-line
   }, []);
   return (
     <div className="App">
@@ -146,9 +149,10 @@ function App() {
             :
             <>  {/* user dashboard */}
               <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} />
+            
               <Routes>
                 <Route path="/" element={<Recomended addToCart={addToCart} />} />
-
+                <Route path="/address" element={<Profile/>}/>
               </Routes>
             </>
         }

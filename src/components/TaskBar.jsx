@@ -49,7 +49,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
     
 
     return (
-        <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
+        <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50   ">
             <div className="container mx-auto flex justify-between items-center px-4 py-2">
                 
                 {/* Left Section (Menu Button & Logo) */}
@@ -194,6 +194,9 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                         <Link to="/" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                             Home
                         </Link>
+                        <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
+                            Address
+                        </Link>
 
                         <button onClick={() => {
                             if (window.confirm("Do You Want To Logout...")) {
@@ -201,6 +204,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                                 Cookies.remove('userId');
                                 Cookies.remove('firstName');
                                 Cookies.remove('lastName');
+                               
                                 navigate('./');
                                 window.location.reload();
                             }
