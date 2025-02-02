@@ -55,7 +55,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                 {/* Left Section (Menu Button & Logo) */}
                 <div className="flex items-center space-x-4">
                     {/* Hamburger Menu Button (Only for Mobile) */}
-                    <div className="md:hidden">
+                    <div className="lg:hidden">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="text-gray-600 focus:outline-none"
@@ -85,12 +85,20 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                 </div>
 
                 {/* Menu Links (Pushed to Right) */}
-                <div className="hidden md:flex md:items-center space-x-8 ml-auto">
+                <div className="hidden lg:flex md:items-center space-x-8 ml-auto">
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="font-bold text-2xl text-gray-600 hover:text-green-600">
                         Home
                     </Link>
                     <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                         Address
+                    </Link>
+                    <Link>
+                        {
+                            parseInt(Cookies.get('isBlind')) ?
+                                <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                                :
+                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                        }
                     </Link>
 
                     {/* Logout Button */}
@@ -120,7 +128,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
 
             {/* Cart Box (Visible when cart is toggled) */}
             {isCartOpen && (
-                <div className="absolute top-[60px] z-50 right-2 bg-white shadow-lg p-4 rounded-lg w-[340px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
+                <div className="absolute top-[60px] z-50 right-2 bg-white shadow-lg p-4 rounded-lg max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
                     {/* Close Button */}
                     <button
                         onClick={() => setIsCartOpen(false)}
@@ -192,8 +200,8 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
 
             {/* Dropdown Menu for Small Devices */}
             {isMenuOpen && (
-                <div className="md:hidden shadow-md">
-                    <div className="flex flex-col space-y-2 px-4 py-3">
+                <div className="lg:hidden shadow-md">
+                    <div className="flex flex-col gap-4 space-y-2 px-4 py-2">
                         <Link to="/" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                             Home
                         </Link>
@@ -201,13 +209,13 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                             Address
                         </Link>
                         <Link>
-                          {
-                            !Cookies.get('isBlind')?                         
-                            <button  onClick={()=>{ Cookies.set('isBlind',!Cookies.get('isBlind'), { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
-                             :
-                            <button  onClick={()=>{ Cookies.set('isBlind',!Cookies.get('isBlind'), { expires: 30 })}} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
-                         }
-                            </Link>  
+                            {
+                                parseInt(Cookies.get('isBlind')) ?
+                                    <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                                    :
+                                    <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                            }
+                        </Link>
 
                         <button onClick={() => {
                             if (window.confirm("Do You Want To Logout...")) {

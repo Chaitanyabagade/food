@@ -9,8 +9,7 @@ const Recomended = ({ addToCart }) => {
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
   const [isStrted, setIsStarted] = useState(0);
-  // eslint-disable-next-line
-  const [isBlind, setIsBlind] = useState(0);
+ 
   // Fetch menu item data
   const getMenuItemData = () => {
     const url = `${process.env.REACT_APP_domain}food/getMenuItemData.php`;
@@ -294,13 +293,7 @@ const Recomended = ({ addToCart }) => {
     }
   };
 
-  useEffect(()=>{
-    
-     let x = Cookies.get('isBlind');
-     setIsBlind(x);
-     console.log(x);
-     
-  },[]);
+
 
   const [isconfirm, setisconferm] = useState(0);
   useEffect(() => {
@@ -366,7 +359,7 @@ const Recomended = ({ addToCart }) => {
         </svg>
       </div>
       {
-        !Cookies.get('isBlind')? <button
+        parseInt(Cookies.get('isBlind'))? <button
           onClick={() => { !isStrted && startOrdering(); setIsStarted(1) }}
           onDoubleClick={() => { window.location.reload() }}
           className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
