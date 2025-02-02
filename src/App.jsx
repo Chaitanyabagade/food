@@ -75,7 +75,10 @@ function App() {
 
   function setCartItemsfunction(updatedCart) {
     setCartItems(updatedCart);
-
+    
+  }
+  function clearCart(){
+    setCartItems([]);
   }
   function addToCart(id, name, qty, price) {
     // Check if the item already exists in the cart
@@ -148,10 +151,10 @@ function App() {
               </>
             :
             <>  {/* user dashboard */}
-              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} />
+              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData}  />
             
               <Routes>
-                <Route path="/" element={<Recomended addToCart={addToCart} />} />
+                <Route path="/" element={<Recomended addToCart={addToCart} clearCart={clearCart} cart={cartItems} />} />
                 <Route path="/address" element={<Profile/>}/>
               </Routes>
             </>

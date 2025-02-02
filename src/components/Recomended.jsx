@@ -4,12 +4,13 @@ import { toast } from 'react-toastify';
 import { FcPlus } from "react-icons/fc";
 import { GrFormSubtract } from "react-icons/gr";
 import Cookies from 'js-cookie';
-const Recomended = ({ addToCart }) => {
+import Fuse from 'fuse.js';
+const Recomended = ({ addToCart, clearCart, cart }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
   const [isStrted, setIsStarted] = useState(0);
- 
+
   // Fetch menu item data
   const getMenuItemData = () => {
     const url = `${process.env.REACT_APP_domain}food/getMenuItemData.php`;
@@ -96,16 +97,85 @@ const Recomended = ({ addToCart }) => {
     synth.speak(utterance);
   };
 
+  const start = () => {
+    speakWithCallback("you want to listen the Operation List? say two times  ( yes or no )", "hi-IN", () => {
+      startSpeechRecognition("skip");
+    });
+  }
+  const handleSkip = (result) => {
+    const lowerConfirm = result.trim().toLowerCase();
+    if (["no", "incorrect"].some(word => lowerConfirm.includes(word))) {
+      speakWithCallback("Please Tell me which operation you want to do?", "hi-IN", () => {
+        startSpeechRecognition("operation");
+      });
+    }
+    else if (["yes", "correct"].some(word => lowerConfirm.includes(word))) {
+      SpeakMenuList();
+    }
+    else {
+      speakWithCallback("I didn't hear anything. Please try again.", "hi-IN", () => {
+        startSpeechRecognition('skip');
+      });
+    }
+  }
 
+  const operations = ['add to cart', 'open cart', 'clear cart', 'check cart items'];
+  const SpeakMenuList = () => {
+    const speechtext = operations.map((item,index )=> `${index+1}! ${item} !! `).join(',');
+    speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
+      startSpeechRecognition("operation");
+    });
+  }
+  const handleOperation = (operation) => {
+
+    const options = {
+      includeScore: true,
+      threshold: 0.3,
+    };
+    const fuse = new Fuse(operations, options);
+    const result = fuse.search(operation);
+    console.log("operation detected=>", result.map((res) => res.item)[0]);
+    if (result.map((res) => res.item)[0] === 'add to cart') {
+      console.log("adding to cart");
+      startAddToCart();
+    }
+    else if (result.map((res) => res.item)[0] === 'clear cart') {
+      clearCart();
+      speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN");
+    }
+    else if (result.map((res) => res.item)[0] === 'check cart items') {
+      speakCartDetails();
+    }
+    else {
+      speakWithCallback("Sorry! I Don't Found Operation Please Say Correct Operation Name", "hi-IN", () => {
+        startSpeechRecognition("operation");
+      });
+    }
+  }
   // Start ordering process
-  const startOrdering = () => {
+  const startAddToCart = () => {
     if (isListening) return;
-
     speakWithCallback("Hello! What would you like to add in cart?", "hi-IN", () => {
-      startSpeechRecognition("order");
+      startSpeechRecognition("addToCart");
     });
   };
 
+  const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+  
+  const speakCartDetails = () => {
+    if (cart.length === 0) {
+      speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN");
+      return;
+    }
+    const itemsDescription = cart
+      .map(item => `${item.qty}!${item.name} ! price! ${item.price} rupees!`)
+      .join(',');
+    const totalDescription = `Total items:! ${totalItems}.! Total price:! ${totalPrice} rupees.!`;
+
+    const speechText = `Your cart contains: ${itemsDescription}. ${totalDescription}`;
+    speakWithCallback(`${speechText}`, "en-IN");
+  };
   // Reset and start speech recognition for a given type (order, quantity, confirmation)
   const startSpeechRecognition = (type) => {
     if (!recognition) return;
@@ -131,10 +201,12 @@ const Recomended = ({ addToCart }) => {
       speechDetected = true;
       const result = event.results[0][0].transcript.trim();
 
-      if (type === "order") handleOrder(result);
+      if (type === "addToCart") handleAddToCart(result);
       else if (type === "quantity") handleQuantity(result);
       else if (type === "confirmation") handleConfirmation(result);
       else if (type === 'iteamconfirmation') handleConfirmationofitem(result);
+      else if (type === 'operation') handleOperation(result);
+      else if (type === 'skip') handleSkip(result);
     };
 
     recognition.onerror = (event) => {
@@ -172,15 +244,15 @@ const Recomended = ({ addToCart }) => {
 
   // Handle order input (item name)
   // Handle order input (item name)
-  const handleOrder = (order) => {
+  const handleAddToCart = (item) => {
 
-    setCurrentOrder((prev) => ({ ...prev, itemId: order }));
+    setCurrentOrder((prev) => ({ ...prev, itemId: item }));
     speakWithCallback(`wait... i am checking the item it takes few seconds`, "hi-IN");
 
     const url = `${process.env.REACT_APP_domain}food/user/checkTheItem.php`;
     const formData = new FormData();
-    console.log(order);
-    formData.append('product_name', order);
+    console.log(item);
+    formData.append('product_name', item);
     axios.post(url, formData)
       .then((response) => {
         console.log(response.data);
@@ -191,7 +263,7 @@ const Recomended = ({ addToCart }) => {
           itemId: response.data.item_id
         }));
         if (response.data.error === 'No matching item found') {
-          speakWithCallback(`Sorry! the Item ${order} is not found so Say correct item name or try another.`, "hi-IN", () => {
+          speakWithCallback(`Sorry! the Item ${item} is not found so Say correct item name or try another.`, "hi-IN", () => {
             speakWithCallback(`What would you want to add to cart.`, "hi-IN", () => {
               startSpeechRecognition("order");
               setisconferm(0);
@@ -293,11 +365,8 @@ const Recomended = ({ addToCart }) => {
     }
   };
 
-
-
   const [isconfirm, setisconferm] = useState(0);
   useEffect(() => {
-  
     if (isconfirm) {
       speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemId} In your cart.`, "hi-IN");
       addToCart(add.itemId, add.itemName, add.qty, add.itemPrice);
@@ -306,7 +375,7 @@ const Recomended = ({ addToCart }) => {
       setIsStarted(0);
     }
     // eslint-disable-next-line
-  }, [isconfirm,Cookies.get('isBlind')]);
+  }, [isconfirm]);
 
   const handleConfirmation = (confirmation) => {
     const lowerConfirm = confirmation.trim().toLowerCase();
@@ -359,9 +428,9 @@ const Recomended = ({ addToCart }) => {
         </svg>
       </div>
       {
-        parseInt(Cookies.get('isBlind'))? <button
-          onClick={() => { !isStrted && startOrdering(); setIsStarted(1) }}
-          onDoubleClick={() => { window.location.reload() }}
+        parseInt(Cookies.get('isBlind')) ? <button
+          onClick={() => { !isStrted && setIsStarted(1); start() }}
+
           className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
              fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
           Start
