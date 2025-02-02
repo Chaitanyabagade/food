@@ -3,14 +3,14 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FcPlus } from "react-icons/fc";
 import { GrFormSubtract } from "react-icons/gr";
-
+import Cookies from 'js-cookie';
 const Recomended = ({ addToCart }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
   const [isStrted, setIsStarted] = useState(0);
   // eslint-disable-next-line
-  const [isBlind, setIsBlind] = useState(1);
+  const [isBlind, setIsBlind] = useState(0);
   // Fetch menu item data
   const getMenuItemData = () => {
     const url = `${process.env.REACT_APP_domain}food/getMenuItemData.php`;
@@ -65,7 +65,7 @@ const Recomended = ({ addToCart }) => {
   const [isListening, setIsListening] = useState(false);
   // eslint-disable-next-line
   const [currentOrder, setCurrentOrder] = useState({ itemId: "", qty: 0 });
-  const [add, setadd] = useState({itemId:0,itemName:'',itemPrice:0,qty:1});
+  const [add, setadd] = useState({ itemId: 0, itemName: '', itemPrice: 0, qty: 1 });
 
 
   useEffect(() => {
@@ -176,30 +176,40 @@ const Recomended = ({ addToCart }) => {
   const handleOrder = (order) => {
 
     setCurrentOrder((prev) => ({ ...prev, itemId: order }));
-    speakWithCallback(`wait... i am checking the item`, "hi-IN");
-  
+    speakWithCallback(`wait... i am checking the item it takes few seconds`, "hi-IN");
+
     const url = `${process.env.REACT_APP_domain}food/user/checkTheItem.php`;
     const formData = new FormData();
     console.log(order);
     formData.append('product_name', order);
     axios.post(url, formData)
       .then((response) => {
-         console.log(response.data);
-         setadd(prevState => ({
+        console.log(response.data);
+        setadd(prevState => ({
           ...prevState,
-           itemPrice:response.data.price,
-           itemName:response.data.name,
-           itemId:response.data.item_id
+          itemPrice: response.data.price,
+          itemName: response.data.name,
+          itemId: response.data.item_id
         }));
-        speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes correct, or No Incorrect.`, "hi-IN", () => {
-          startSpeechRecognition('iteamconfirmation');
-        });
+        if (response.data.error === 'No matching item found') {
+          speakWithCallback(`Sorry! the Item ${order} is not found so Say correct item name or try another.`, "hi-IN", () => {
+            speakWithCallback(`What would you want to add to cart.`, "hi-IN", () => {
+              startSpeechRecognition("order");
+              setisconferm(0);
+            });
+          });
+        }
+        else {
+          speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes correct, or No Incorrect.`, "hi-IN", () => {
+            startSpeechRecognition('iteamconfirmation');
+          });
+        }
       })
       .catch(error => {
         toast.error(error, " Try Again...!");
         setSpinner(0);
       });
-  
+
   };
 
   // Handle confirmation input
@@ -269,9 +279,9 @@ const Recomended = ({ addToCart }) => {
             // Update `add` only after confirmation
             setadd(prevState => ({
               ...prevState,
-              qty:number // Update only itemName
+              qty: number // Update only itemName
             }));
-            
+
             startSpeechRecognition("confirmation");
           }
         );
@@ -284,17 +294,26 @@ const Recomended = ({ addToCart }) => {
     }
   };
 
+  useEffect(()=>{
+    
+     let x = Cookies.get('isBlind');
+     setIsBlind(x);
+     console.log(x);
+     
+  },[]);
+
   const [isconfirm, setisconferm] = useState(0);
   useEffect(() => {
+  
     if (isconfirm) {
       speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemId} In your cart.`, "hi-IN");
       addToCart(add.itemId, add.itemName, add.qty, add.itemPrice);
-     
+
       setisconferm(0);
       setIsStarted(0);
     }
     // eslint-disable-next-line
-  }, [isconfirm]);
+  }, [isconfirm,Cookies.get('isBlind')]);
 
   const handleConfirmation = (confirmation) => {
     const lowerConfirm = confirmation.trim().toLowerCase();
@@ -347,14 +366,14 @@ const Recomended = ({ addToCart }) => {
         </svg>
       </div>
       {
-        isBlind ? <button
+        !Cookies.get('isBlind')? <button
           onClick={() => { !isStrted && startOrdering(); setIsStarted(1) }}
           onDoubleClick={() => { window.location.reload() }}
           className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
-             fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+             fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
           Start
         </button> :
-          ''
+          <></>
       }
 
       {/* Menu Items */}
@@ -367,7 +386,7 @@ const Recomended = ({ addToCart }) => {
               className="bg-white p-1 md:p-6 rounded-xl shadow-lg flex flex-col justify-between transform transition cursor-pointer"
             >
               <img
-                src={`https://darkslategray-lion-860323.hostingersite.com/food/menuitemimg/${item.image_url}`}
+                src={`${process.env.REACT_APP_domain}food/menuitemimg/${item.image_url}`}
                 alt={item.name}
                 className="w-full object-cover bg-white rounded-lg"
               />

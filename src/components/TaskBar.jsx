@@ -120,7 +120,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
 
             {/* Cart Box (Visible when cart is toggled) */}
             {isCartOpen && (
-                <div className="absolute top-[60px] right-2 bg-white shadow-lg p-4 rounded-lg w-[340px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
+                <div className="absolute top-[60px] z-50 right-2 bg-white shadow-lg p-4 rounded-lg w-[340px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
                     {/* Close Button */}
                     <button
                         onClick={() => setIsCartOpen(false)}
@@ -200,6 +200,14 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                         <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                             Address
                         </Link>
+                        <Link>
+                          {
+                            !Cookies.get('isBlind')?                         
+                            <button  onClick={()=>{ Cookies.set('isBlind',0, { expires: 30 }) }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                             :
+                            <button  onClick={()=>{ Cookies.set('isBlind',1, { expires: 30 })}} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                         }
+                            </Link>  
 
                         <button onClick={() => {
                             if (window.confirm("Do You Want To Logout...")) {
