@@ -3,7 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 const Profile = () => {
-  const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
     firstname: Cookies.get('firstName'),
     lastname: Cookies.get('lastName'),
     email: Cookies.get('email'),
@@ -35,8 +35,8 @@ const Profile = () => {
   };
 
   return (
-  
-    <div className="max-w-md mx-auto p-4 bg-white  shadow-lg rounded-lg z-[10] fixed mt-[100px] mx-5 ">
+   <div className="w-full h-[100%] flex justify-center mt-10">
+    <div className="max-w-md  p-4 bg-white  shadow-lg rounded-lg z-[10] fixed mt-[100px] mx-5 ">
       <h2 className="text-xl font-bold mb-4 text-center w-full ">Profile</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input type="text" name="street" value={formData.street} onChange={handleChange} placeholder="Street" className="w-full p-2 border rounded" required />
@@ -49,6 +49,7 @@ const Profile = () => {
         </label>
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Save Address</button>
       </form>
+    </div>
     </div>
   );
 };

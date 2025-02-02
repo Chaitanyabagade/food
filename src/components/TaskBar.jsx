@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import { FiShoppingCart } from "react-icons/fi"; // Import cart icon
 import { FcPlus } from "react-icons/fc";
 import { GrFormSubtract } from "react-icons/gr";
-const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
+const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false); // State to toggle cart box
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
     const toggleCart = () => {
         setIsCartOpen(!isCartOpen);
     };
-    
+
     const increaseQty = (id) => {
         const updatedCart = cartItems.map(item => {
             if (item.id === id) {
@@ -46,12 +46,12 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
     const saveToCard = () => {
         saveCartData();
     };
-    
+
 
     return (
         <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50   ">
             <div className="container mx-auto flex justify-between items-center px-4 py-2">
-                
+
                 {/* Left Section (Menu Button & Logo) */}
                 <div className="flex items-center space-x-4">
                     {/* Hamburger Menu Button (Only for Mobile) */}
@@ -89,6 +89,9 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="font-bold text-2xl text-gray-600 hover:text-green-600">
                         Home
                     </Link>
+                    <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
+                        Address
+                    </Link>
 
                     {/* Logout Button */}
                     <button onClick={() => {
@@ -110,7 +113,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                 <button onClick={toggleCart} className="text-gray-600 hover:text-green-600 relative ml-[40px] mt-[3px] flex">
                     <FiShoppingCart className="w-8 h-8" />
                     <div className="items font-bold mt-[20px] w-[30px] h-[30px] text-center rounded-full border-2 border-gray-400">
-                    {cartItems.reduce((acc, item) => acc + item.qty, 0)}
+                        {cartItems.reduce((acc, item) => acc + item.qty, 0)}
                     </div>
                 </button>
             </div>
@@ -119,8 +122,8 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
             {isCartOpen && (
                 <div className="absolute top-[60px] right-2 bg-white shadow-lg p-4 rounded-lg w-[340px] max-h-[400px] border-2 border-purple-300 mt-[10px] overflow-auto">
                     {/* Close Button */}
-                    <button 
-                        onClick={() => setIsCartOpen(false)} 
+                    <button
+                        onClick={() => setIsCartOpen(false)}
                         className="absolute top-2 right-2 text-red-600 font-bold text-xl"
                     >
                         &#10005; {/* Cross (X) symbol */}
@@ -148,20 +151,20 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                                                 onClick={() => decreaseQty(item.id)}
                                                 className="text-red-600 font-bold text-xl"
                                             >
-                                               <GrFormSubtract style={{ color: 'white', background:'red',borderRadius:'50%',width:'18px', height:'18px',fontWeight: 'bold' }} />
+                                                <GrFormSubtract style={{ color: 'white', background: 'red', borderRadius: '50%', width: '18px', height: '18px', fontWeight: 'bold' }} />
                                             </button>
                                             <span className="text-sm">{item.qty}</span>
                                             <button
                                                 onClick={() => increaseQty(item.id)}
                                                 className="text-green-600 font-bold text-xl"
                                             >
-                                               <FcPlus />
+                                                <FcPlus />
                                             </button>
                                         </div>
                                     </td>
                                     <td className="text-right px-2 py-1 text-sm text-gray-600">{item.price}</td>
                                     <td className="text-right px-2 py-1 text-sm text-gray-600">
-                                        <button 
+                                        <button
                                             onClick={() => removeItem(item.id)}
                                             className="text-red-600 font-bold"
                                         >
@@ -181,8 +184,8 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                     <div className="mt-4 w-full justify-center flex space-x-4">
                         {/* Checkout Button */}
                         <button className="w-fit px-10 bg-blue-700 text-white py-2 rounded-lg">Checkout</button>
-                        
-                      
+
+
                     </div>
                 </div>
             )}
@@ -204,7 +207,7 @@ const TaskBar = ({cartItems,setCartItemsfunction,saveCartData }) => {
                                 Cookies.remove('userId');
                                 Cookies.remove('firstName');
                                 Cookies.remove('lastName');
-                               
+
                                 navigate('./');
                                 window.location.reload();
                             }
