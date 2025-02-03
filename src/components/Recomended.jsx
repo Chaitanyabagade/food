@@ -144,7 +144,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       clearCart();
       speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN");
     }
-    else if (result.map((res) => res.item)[0] === 'check cart') {
+    else if (result.map((res) => res.item)[0] === 'check cart items') {
       speakCartDetails();
     }
     else if (result.map((res) => res.item)[0] === 'add address') {
@@ -285,15 +285,13 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         .toString()
         .split("")
         .map(char => (char === '0' ? 'zero' : char === '1' ? 'one' : char === '2' ? 'two' : char === '3' ? 'three' : char === '4' ? 'four' : char === '5' ? 'five' : char === '6' ? 'six' : char === '7' ? 'seven' : char === '8' ? 'eight' : char === '9' ? 'nine' : char)) // Replace '0' with 'zero'
-        .join(" ");
+        .join("");
       
       const addressSpeech = `Street, ${address.street}! City, ${address.city}! State, ${address.state}! Postal Code, ${spacedPostalCode}! Country, ${address.country}`;
       setAddress({ street: '', city: '', state: '', postcode: '', country: '' });
       speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Addresse Saved Successfull".`, "hi-IN", () => {
         window.location.reload();
       });
-
-
 
     }
 
