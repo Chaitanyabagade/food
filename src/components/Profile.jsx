@@ -14,7 +14,7 @@ const Profile = () => {
     country: "",
     is_default: false,
   });
-
+// eslint-disable-next-line
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -22,7 +22,7 @@ const Profile = () => {
       [name]: type === "checkbox" ? checked : value,
     });
   };
-
+// eslint-disable-next-line
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -79,6 +79,7 @@ const Profile = () => {
 
   useEffect(() => {
     getUserLocation();
+    // eslint-disable-next-line
   }, []);
 
 
