@@ -6,6 +6,7 @@ import { GrFormSubtract } from "react-icons/gr";
 import Cookies from 'js-cookie';
 import Fuse from 'fuse.js';
 const Recomended = ({ addToCart, clearCart, cart }) => {
+
   const [menuItems, setMenuItems] = useState([]);
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
@@ -119,9 +120,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
-  const operations = ['add to cart', 'open cart', 'clear cart', 'check cart items'];
+  const operations = ['add to cart', 'clear cart', 'check cart items', 'exit'];
   const SpeakMenuList = () => {
-    const speechtext = operations.map((item,index )=> `${index+1}! ${item} !! `).join(',');
+    const speechtext = operations.map((item, index) => `${index + 1}! ${item} !! `).join(',');
     speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
       startSpeechRecognition("operation");
     });
@@ -143,8 +144,11 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       clearCart();
       speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN");
     }
-    else if (result.map((res) => res.item)[0] === 'check cart items') {
+    else if (result.map((res) => res.item)[0] === 'check cart') {
       speakCartDetails();
+    }
+    else if (result.map((res) => res.item)[0] === 'exit') {
+      speakWithCallback("okay If you want anything, then click on center button.", "hi-IN");
     }
     else {
       speakWithCallback("Sorry! I Don't Found Operation Please Say Correct Operation Name", "hi-IN", () => {
@@ -162,14 +166,14 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
   const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
   const totalPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-  
+
   const speakCartDetails = () => {
     if (cart.length === 0) {
       speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN");
       return;
     }
     const itemsDescription = cart
-      .map(item => `${item.qty}!${item.name} ! price! ${item.price} rupees!`)
+      .map(item => `${item.qty}${item.name} ! price! ${item.price} rupees!`)
       .join(',');
     const totalDescription = `Total items:! ${totalItems}.! Total price:! ${totalPrice} rupees.!`;
 
@@ -426,6 +430,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
             fill="currentFill"
           />
         </svg>
+
       </div>
       {
         parseInt(Cookies.get('isBlind')) ? <button

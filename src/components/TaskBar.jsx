@@ -216,6 +216,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                                 <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
                         }
                     </Link>
+                   
 
                         <button onClick={() => {
                             if (window.confirm("Do You Want To Logout...")) {
