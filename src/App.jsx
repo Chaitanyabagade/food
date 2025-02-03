@@ -50,7 +50,7 @@ function App() {
     // Convert jsonData to a Blob and append it
     const jsonBlob = new Blob([JSON.stringify(cartItems)], { type: 'application/json' });
     formData.append('jsonData', jsonBlob);
-    
+
     // Append additional fields
     formData.append('email', Cookies.get('email'));
     formData.append('firstname', Cookies.get('firstName'));
@@ -75,9 +75,9 @@ function App() {
 
   function setCartItemsfunction(updatedCart) {
     setCartItems(updatedCart);
-    
+
   }
-  function clearCart(){
+  function clearCart() {
     setCartItems([]);
   }
   function addToCart(id, name, qty, price) {
@@ -108,33 +108,35 @@ function App() {
     // eslint-disable-next-line
   }, [cartItems]);
 
-  const [isUserloged, setLoged] = useState(0);
-  const [isAdmin, setIsAdmin] = useState(0);
+ 
   useEffect(() => {
-    if (Cookies.get('adminEmail') && Cookies.get('admin')) {
-      setIsAdmin(1);
-    }
-    else if (Cookies.get('email') && Cookies.get('userId')) {
-      setLoged(1);
-    }
-
     fetchCartItems();
     // eslint-disable-next-line
   }, []);
+
   return (
     <div className="App">
       <BrowserRouter>
 
         {
-          !isUserloged ?
-            isAdmin ?
-              <>  {/* Admin dashboard */}
-                <AdminNav />
+          (parseInt(Cookies.get('admin')))?
+            <>  {/* Admin dashboard */}
+              <AdminNav />
+              <h1 className='mt-[200px]'>This is addmin panel</h1>
+              <Routes>
+      
+
+
+              </Routes>
+            </>
+            :
+            (parseInt(Cookies.get('userId'))) ?
+              <>  {/* user dashboard */}
+                <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} />
 
                 <Routes>
-
-
-
+                  <Route path="/" element={<Recomended addToCart={addToCart} clearCart={clearCart} cart={cartItems} />} />
+                  <Route path="/address" element={<Profile />} />
                 </Routes>
               </>
               :
@@ -149,15 +151,8 @@ function App() {
                   <Route path="/Contact" element={<Contact />} />
                 </Routes>
               </>
-            :
-            <>  {/* user dashboard */}
-              <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData}  />
-            
-              <Routes>
-                <Route path="/" element={<Recomended addToCart={addToCart} clearCart={clearCart} cart={cartItems} />} />
-                <Route path="/address" element={<Profile/>}/>
-              </Routes>
-            </>
+
+
         }
 
       </BrowserRouter>

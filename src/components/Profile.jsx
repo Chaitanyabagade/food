@@ -33,8 +33,6 @@ const Profile = () => {
       alert("Failed to save address.");
     }
   };
- 
- 
 
   return (
    <div className="w-full h-[100%] flex justify-center mt-10">

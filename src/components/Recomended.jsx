@@ -149,7 +149,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
     else if (result.map((res) => res.item)[0] === 'add address') {
       speakWithCallback("okay.Tell Me Street or place name .", "hi-IN", () => {
-         startSpeechRecognition('street');
+        startSpeechRecognition('street');
       });
     }
     else if (result.map((res) => res.item)[0] === 'exit') {
@@ -197,17 +197,17 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     console.log(newStreet);
     speakWithCallback("okay. Now Tell Me City Name .", "hi-IN", () => {
       startSpeechRecognition('city');
-   });
+    });
   };
-  
+
   const updateCity = (newCity) => {
     setAddress(prevState => ({
       ...prevState,
-       city: newCity
+      city: newCity
     }));
     speakWithCallback("okay. Now Tell Me State Name .", "hi-IN", () => {
-     startSpeechRecognition('state');
-   });
+      startSpeechRecognition('state');
+    });
   };
 
   const updateState = (newState) => {
@@ -217,35 +217,88 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }));
     speakWithCallback("okay. Now Tell Me post code.", "hi-IN", () => {
       startSpeechRecognition('postcode');
-   });
+    });
   };
 
   const updatePostcode = (newPostcode) => {
     setAddress(prevState => ({
       ...prevState,
-       postcode: newPostcode
+      postcode: newPostcode
     }));
     speakWithCallback("okay. Now Tell Me Country Name .", "hi-IN", () => {
       startSpeechRecognition('country');
-     
-   });
+
+    });
   };
 
   const updateCountry = (newCountry) => {
     setAddress(prevState => ({
       ...prevState,
-       country: newCountry
+      country: newCountry
     }));
   };
 
-  useEffect(()=>{
-    if(address.country.length>0 && address.city.length>0&& address.state.length>0&& address.street.length>0&& address.postcode.length>0){
-      const spacedPostalCode = address.postcode.toString().split("").join(" ");
-      const addressSpeech=`Street,${address.street}! City,${address.city}! State,${address.state}! Postal Code, ${spacedPostalCode} ! Country ${address.country}`;
-      speakWithCallback(`okay Fine. Check Once The Address is Correct or not. ${addressSpeech}! Conferm To Save Say (yes correct or no cancle).`, "hi-IN");
+
+  const [formData, setFormData] = useState({
+    firstname: Cookies.get('firstName'),
+    lastname: Cookies.get('lastName'),
+    email: Cookies.get('email'),
+    street: "",
+    city: "",
+    state: "",
+    postal_code: "",
+    country: "",
+    is_default: false,
+  });
+
+  const handleSubmitAdressToSave = () => {
+    console.log(formData);
+    axios.post(`${process.env.REACT_APP_domain}food/user/Profile.php`, formData)
+      .then((response) => {
+        const APIResponse = response.data; // This is the response data from AXIOS
+        toast.success(APIResponse.message || 'Success!'); // Safely access message in response
+        console.log(APIResponse);
+      })
+      .catch(error => {
+        // Check if error is a response object (for HTTP errors), or a request/network error
+        const errorMessage = error.response?.data?.message || error.message || 'Try Again...!';
+        toast.error(errorMessage); // Pass a valid error message string to toast
+        setSpinner(0); // Stop spinner on error
+      });
+  }
+
+  useEffect(() => {
+    setFormData({
+      firstname: Cookies.get('firstName'),
+      lastname: Cookies.get('lastName'),
+      email: Cookies.get('email'),
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      postal_code: address.postcode,
+      country: address.country,
+      is_default: false,
+    });
+    if (address.country.length > 0 && address.city.length > 0 && address.state.length > 0 && address.street.length > 0 && address.postcode.length > 0) {
+      handleSubmitAdressToSave();
+      const spacedPostalCode = address.postcode
+        .toString()
+        .split("")
+        .map(char => (char === '0' ? 'zero' : char === '1' ? 'one' : char === '2' ? 'two' : char === '3' ? 'three' : char === '4' ? 'four' : char === '5' ? 'five' : char === '6' ? 'six' : char === '7' ? 'seven' : char === '8' ? 'eight' : char === '9' ? 'nine' : char)) // Replace '0' with 'zero'
+        .join(" ");
+      
+      const addressSpeech = `Street, ${address.street}! City, ${address.city}! State, ${address.state}! Postal Code, ${spacedPostalCode}! Country, ${address.country}`;
+      setAddress({ street: '', city: '', state: '', postcode: '', country: '' });
+      speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Confirm to save by saying "yes correct" or "no cancel".`, "hi-IN", () => {
+        startSpeechRecognition("skip");
+      });
+
+
+
     }
+
     // eslint-disable-next-line
-  },[address]);
+  }, [address]);
 
 
 
@@ -274,7 +327,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     recognition.onerror = null;
     recognition.onspeechend = null;
     recognition.onend = null;
-   
+
     recognition.onresult = (event) => {
       speechDetected = true;
       const result = event.results[0][0].transcript.trim();
@@ -512,12 +565,12 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       </div>
       {
         parseInt(Cookies.get('isBlind')) ? <button
-        onClick={() => { 
-          if (!isStrted) {
+          onClick={() => {
+            if (!isStrted) {
               start();
-              setIsStarted(1); 
-          }
-      }}
+              setIsStarted(1);
+            }
+          }}
 
           className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
              fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">

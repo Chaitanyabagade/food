@@ -28,7 +28,7 @@ const AdminLogin = () => {
         console.log(APIResponse);
         if (APIResponse.status_code === '200' && APIResponse.status === 'success' && APIResponse.message === 'Logged In') {
           Cookies.set('adminEmail', APIResponse.email, { expires: 30 });
-          Cookies.set('admin', APIResponse.email, { expires: 30 });
+          Cookies.set('admin', 1, { expires: 30 });
           toast.success("Login Successful...");
           setTimeout(() => {
             navigate('/');
