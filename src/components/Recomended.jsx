@@ -289,8 +289,8 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       
       const addressSpeech = `Street, ${address.street}! City, ${address.city}! State, ${address.state}! Postal Code, ${spacedPostalCode}! Country, ${address.country}`;
       setAddress({ street: '', city: '', state: '', postcode: '', country: '' });
-      speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Confirm to save by saying "yes correct" or "no cancel".`, "hi-IN", () => {
-        startSpeechRecognition("skip");
+      speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Addresse Saved Successfull".`, "hi-IN", () => {
+        window.location.reload();
       });
 
 
