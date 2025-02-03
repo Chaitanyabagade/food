@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
@@ -14,7 +14,7 @@ const Profile = () => {
     country: "",
     is_default: false,
   });
-// eslint-disable-next-line
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -22,7 +22,7 @@ const Profile = () => {
       [name]: type === "checkbox" ? checked : value,
     });
   };
-// eslint-disable-next-line
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -33,61 +33,12 @@ const Profile = () => {
       alert("Failed to save address.");
     }
   };
-   //////////////////user location /////////
-   const [location, setLocation] = useState({
-    street: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
-  });
+ 
+ 
 
-  const getAddressFromCoordinates = (latitude, longitude) => {
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-      .then(response => response.json())
-      .then(data => {
-        const { road, city, state, postcode, country } = data.address || {};
-        console.log(`Street: ${road}`);
-        console.log(`City: ${city}`);
-        console.log(`State: ${state}`);
-        console.log(`Postal Code: ${postcode}`);
-        console.log(`Country: ${country}`);
-        setLocation({
-          street: road || "Unknown",
-          city: city || "Unknown",
-          state: state || "Unknown",
-          postalCode: postcode || "Unknown",
-          country: country || "Unknown",
-        });
-      })
-      .catch(error => console.error("Error fetching address:", error));
-  };
-
-  const getUserLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          getAddressFromCoordinates(latitude, longitude);
-        },
-        (error) => console.error("Error getting location:", error)
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
-  };
-
-  useEffect(() => {
-    getUserLocation();
-    // eslint-disable-next-line
-  }, []);
-
-
-
-  ////////////// end of user locationo//////////////
   return (
-   <div className="w-full h-[100%] flex justify-center mt-[100px]">
-   {/* <div className="max-w-md  p-4 bg-white  shadow-lg rounded-lg z-[10] fixed mt-[100px] mx-5 ">
+   <div className="w-full h-[100%] flex justify-center mt-10">
+    <div className="max-w-md  p-4 bg-white  shadow-lg rounded-lg z-[10] fixed mt-[100px] mx-5 ">
       <h2 className="text-xl font-bold mb-4 text-center w-full ">Profile</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input type="text" name="street" value={formData.street} onChange={handleChange} placeholder="Street" className="w-full p-2 border rounded" required />
@@ -101,22 +52,6 @@ const Profile = () => {
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Save Address</button>
       </form>
     </div>
-     */}  <div className="p-4 bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-            <h2 className="text-xl font-semibold mb-4">Your Address</h2>
-            <div className="bg-white shadow-md rounded-lg p-4 w-80">
-                <p><strong>Street:</strong> {location.street}</p>
-                <p><strong>City:</strong> {location.city}</p>
-                <p><strong>State:</strong> {location.state}</p>
-                <p><strong>Postal Code:</strong> {location.postalCode}</p>
-                <p><strong>Country:</strong> {location.country}</p>
-            </div>
-            <button 
-                onClick={getUserLocation}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-                Refresh Location
-            </button>
-        </div>
     </div>
   );
 };

@@ -120,7 +120,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
-  const operations = ['add to cart', 'clear cart', 'check cart items', 'exit'];
+  const operations = ['add to cart', 'clear cart', 'check cart items', 'add address', 'exit'];
   const SpeakMenuList = () => {
     const speechtext = operations.map((item, index) => `${index + 1}! ${item} !! `).join(',');
     speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
@@ -146,6 +146,11 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
     else if (result.map((res) => res.item)[0] === 'check cart') {
       speakCartDetails();
+    }
+    else if (result.map((res) => res.item)[0] === 'add address') {
+      speakWithCallback("okay.Tell Me Street or place name .", "hi-IN", () => {
+         startSpeechRecognition('street');
+      });
     }
     else if (result.map((res) => res.item)[0] === 'exit') {
       speakWithCallback("okay If you want anything, then click on center button.", "hi-IN");
@@ -180,6 +185,75 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     const speechText = `Your cart contains: ${itemsDescription}. ${totalDescription}`;
     speakWithCallback(`${speechText}`, "en-IN");
   };
+
+  ////////////add address ///////
+  const [address, setAddress] = useState({ street: '', city: '', state: '', postcode: '', country: '' });
+
+  const updateStreet = (newStreet) => {
+    setAddress(prevState => ({
+      ...prevState,
+      street: newStreet
+    }));
+    console.log(newStreet);
+    speakWithCallback("okay. Now Tell Me City Name .", "hi-IN", () => {
+      startSpeechRecognition('city');
+   });
+  };
+  
+  const updateCity = (newCity) => {
+    setAddress(prevState => ({
+      ...prevState,
+       city: newCity
+    }));
+    speakWithCallback("okay. Now Tell Me State Name .", "hi-IN", () => {
+     startSpeechRecognition('state');
+   });
+  };
+
+  const updateState = (newState) => {
+    setAddress(prevState => ({
+      ...prevState,
+      state: newState
+    }));
+    speakWithCallback("okay. Now Tell Me post code.", "hi-IN", () => {
+      startSpeechRecognition('postcode');
+   });
+  };
+
+  const updatePostcode = (newPostcode) => {
+    setAddress(prevState => ({
+      ...prevState,
+       postcode: newPostcode
+    }));
+    speakWithCallback("okay. Now Tell Me Country Name .", "hi-IN", () => {
+      startSpeechRecognition('country');
+     
+   });
+  };
+
+  const updateCountry = (newCountry) => {
+    setAddress(prevState => ({
+      ...prevState,
+       country: newCountry
+    }));
+  };
+
+  useEffect(()=>{
+    if(address.country.length>0 && address.city.length>0&& address.state.length>0&& address.street.length>0&& address.postcode.length>0){
+      const spacedPostalCode = address.postcode.toString().split("").join(" ");
+      const addressSpeech=`Street,${address.street}! City,${address.city}! State,${address.state}! Postal Code, ${spacedPostalCode} ! Country ${address.country}`;
+      speakWithCallback(`okay Fine. Check Once The Address is Correct or not. ${addressSpeech}! Conferm To Save Say (yes correct or no cancle).`, "hi-IN");
+    }
+    // eslint-disable-next-line
+  },[address]);
+
+
+
+
+
+
+
+
   // Reset and start speech recognition for a given type (order, quantity, confirmation)
   const startSpeechRecognition = (type) => {
     if (!recognition) return;
@@ -200,7 +274,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     recognition.onerror = null;
     recognition.onspeechend = null;
     recognition.onend = null;
-
+   
     recognition.onresult = (event) => {
       speechDetected = true;
       const result = event.results[0][0].transcript.trim();
@@ -211,6 +285,11 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       else if (type === 'iteamconfirmation') handleConfirmationofitem(result);
       else if (type === 'operation') handleOperation(result);
       else if (type === 'skip') handleSkip(result);
+      else if (type === 'street') updateStreet(result);
+      else if (type === 'city') updateCity(result);
+      else if (type === 'state') updateState(result);
+      else if (type === 'postcode') updatePostcode(result);
+      else if (type === 'country') updateCountry(result);
     };
 
     recognition.onerror = (event) => {
@@ -228,7 +307,6 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     };
 
     recognition.onspeechend = () => {
-      // Stop recognition when speech ends
       recognition.stop();
     };
 
@@ -434,7 +512,12 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       </div>
       {
         parseInt(Cookies.get('isBlind')) ? <button
-          onClick={() => { !isStrted && setIsStarted(1); start() }}
+        onClick={() => { 
+          if (!isStrted) {
+              start();
+              setIsStarted(1); 
+          }
+      }}
 
           className="start w-[300px] h-[300px] bg-green-500 text-white text-8xl pb-5 rounded-full 
              fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
