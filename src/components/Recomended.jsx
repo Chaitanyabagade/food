@@ -181,7 +181,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   // Start ordering process
   const startAddToCart = () => {
     if (isListening) return;
-    speakWithCallback("Hello! What would you like to add in cart?", "hi-IN", () => {
+    speakWithCallback("What would you like to add in cart?", "hi-IN", () => {
       startSpeechRecognition("addToCart");
     });
   };
@@ -653,7 +653,6 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     if (isconfirm) {
       speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemName} In your cart.`, "hi-IN");
       addToCart(add.itemId, add.itemName, add.qty, add.itemPrice);
-
       setisconferm(0);
       setIsStarted(0);
     }
