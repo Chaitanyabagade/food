@@ -18,6 +18,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import Profile from './components/Profile';
 import UserOrders from './components/UserOrders';
+import Dashboard from './components/Dashboard';
 function App() {
   // cart 
   const [cartItems, setCartItems] = useState([]);
@@ -152,23 +153,18 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-
         {
           (parseInt(Cookies.get('admin'))) ?
             <>  {/* Admin dashboard */}
               <AdminNav />
-              <h1 className='mt-[200px]'>This is addmin panel</h1>
               <Routes>
-
-
-
+              <Route path="/" element={<Dashboard/>} />
               </Routes>
             </>
             :
             (parseInt(Cookies.get('userId'))) ?
               <>  {/* user dashboard */}
                 <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} checkout={checkout} />
-
                 <Routes>
                   <Route path="/" element={<Recomended addToCart={addToCart} clearCart={clearCart} cart={cartItems} />} />
                   <Route path="/address" element={<Profile />} />

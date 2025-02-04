@@ -101,7 +101,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData, checkout }) =>
                             parseInt(Cookies.get('isBlind')) ?
                                 <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
                                 :
-                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600 ">Blind Is OFF</button>
                         }
                     </Link>
 

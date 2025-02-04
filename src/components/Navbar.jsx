@@ -84,7 +84,7 @@ const Navbar = () => {
               Login
             </Link>
 
-            <Link to="/AdminLogin" onClick={() => setIsMenuOpen(false)} className="font-bold text-2xl border-2 rounded-lg border-green-600 px-2 pb-[3px] text-gray-600 hover:text-green-600">
+            <Link to="/AdminLogin" onClick={() => setIsMenuOpen(false)} className="font-bold text-2xl border-2 rounded-lg border-green-600 px-2 pb-[3px] text-gray-600 hover:text-green-600 ">
               Admin Login
             </Link>
 
