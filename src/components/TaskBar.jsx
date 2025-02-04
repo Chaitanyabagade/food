@@ -5,7 +5,8 @@ import Cookies from "js-cookie";
 import { FiShoppingCart } from "react-icons/fi"; // Import cart icon
 import { FcPlus } from "react-icons/fc";
 import { GrFormSubtract } from "react-icons/gr";
-const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
+import { toast } from "react-toastify";
+const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData, checkout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false); // State to toggle cart box
     const navigate = useNavigate();
@@ -89,15 +90,18 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="font-bold text-2xl text-gray-600 hover:text-green-600">
                         Home
                     </Link>
+                    <Link to="/orders" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
+                        My Orders
+                    </Link>
                     <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                         Address
                     </Link>
                     <Link>
                         {
                             parseInt(Cookies.get('isBlind')) ?
-                                <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                                <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
                                 :
-                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
                         }
                     </Link>
 
@@ -108,6 +112,8 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                             Cookies.remove('userId');
                             Cookies.remove('firstName');
                             Cookies.remove('lastName');
+                            Cookies.remove('isBlind');
+                            Cookies.remove('isProfileSet');
                             navigate('./');
                             window.location.reload();
                         }
@@ -121,7 +127,7 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                 <button onClick={toggleCart} className="text-gray-600 hover:text-green-600 relative ml-[40px] mt-[3px] flex">
                     <FiShoppingCart className="w-8 h-8" />
                     <div className="items font-bold mt-[20px] w-[30px] h-[30px] text-center rounded-full border-2 border-gray-400">
-                        {cartItems.reduce((acc, item) => acc + item.qty, 0)}
+                        {(cartItems?.reduce((acc, item) => acc + item.qty, 0)) || 0}
                     </div>
                 </button>
             </div>
@@ -191,7 +197,18 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                     </div>
                     <div className="mt-4 w-full justify-center flex space-x-4">
                         {/* Checkout Button */}
-                        <button className="w-fit px-10 bg-blue-700 text-white py-2 rounded-lg">Checkout</button>
+                        <button onClick={
+                            () => {
+                                if (cartItems?.reduce((acc, item) => acc + item.qty, 0)) {
+                                    if (window.confirm("Do you want to Place The Order?")) {
+                                        checkout();
+                                    }
+                                }
+                                else {
+                                    toast.warning("Your Cart Is Empty, Please Add The items in cart.");
+                                }
+                            }
+                        } className="w-fit px-10 bg-blue-700 text-white py-2 rounded-lg">Checkout</button>
 
 
                     </div>
@@ -208,15 +225,20 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                         <Link to="/address" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
                             Address
                         </Link>
+                        <Link to="/orders" onClick={() => setIsMenuOpen(false)} className="block font-bold text-2xl text-gray-600 hover:text-green-600">
+                            My Orders
+                        </Link>
+
                         <Link>
-                        {
-                            parseInt(Cookies.get('isBlind')) ?
-                                <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
-                                :
-                                <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 });window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
-                        }
-                    </Link>
-                   
+                            {
+                                parseInt(Cookies.get('isBlind')) ?
+                                    <button onClick={() => { Cookies.set('isBlind', 0, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is ON</button>
+                                    :
+                                    <button onClick={() => { Cookies.set('isBlind', 1, { expires: 30 }); window.location.reload() }} className="block font-bold text-2xl text-gray-600 hover:text-green-600">Blind Is OFF</button>
+                            }
+                        </Link>
+
+
 
                         <button onClick={() => {
                             if (window.confirm("Do You Want To Logout...")) {
@@ -224,7 +246,8 @@ const TaskBar = ({ cartItems, setCartItemsfunction, saveCartData }) => {
                                 Cookies.remove('userId');
                                 Cookies.remove('firstName');
                                 Cookies.remove('lastName');
-
+                                Cookies.remove('isBlind');
+                                Cookies.remove('isProfileSet');
                                 navigate('./');
                                 window.location.reload();
                             }

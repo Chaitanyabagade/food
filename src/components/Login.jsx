@@ -31,7 +31,7 @@ const Login = () => {
           Cookies.set('userId', APIResponse.userId, { expires: 30 });
           Cookies.set('firstName', APIResponse.firstName, { expires: 30 });
           Cookies.set('lastName', APIResponse.lastName, { expires: 30 });
-          Cookies.set('isProfileSet',APIResponse.isProfileSet,{ expires: 30 })
+          Cookies.set('isProfileSet',APIResponse.isProfileSet,{ expires: 300 })
          
           toast.success("Login Successful...");
           setTimeout(() => {
@@ -109,7 +109,7 @@ const Login = () => {
             <Link to="#forgot-password" className=" text-blue-500 hover:underline">Forgot Password?</Link>
           </div>
           </div>
-
+       
           {/* Submit Button */}
           <button
             onClick={handleSubmit}

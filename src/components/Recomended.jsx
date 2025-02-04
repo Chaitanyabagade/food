@@ -5,8 +5,9 @@ import { FcPlus } from "react-icons/fc";
 import { GrFormSubtract } from "react-icons/gr";
 import Cookies from 'js-cookie';
 import Fuse from 'fuse.js';
+import { useNavigate } from 'react-router-dom';
 const Recomended = ({ addToCart, clearCart, cart }) => {
-
+  const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState([]);
   const [spinner, setSpinner] = useState(0);
   const [menuqty, setMenuqty] = useState([]);
@@ -120,7 +121,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
-  const operations = ['add to cart', 'clear cart', 'check cart items', 'add address', 'exit'];
+  const operations = ['add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
   const SpeakMenuList = () => {
     const speechtext = operations.map((item, index) => `${index + 1}! ${item} !! `).join(',');
     speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
@@ -131,7 +132,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
     const options = {
       includeScore: true,
-      threshold: 0.3,
+      threshold: 0.5,
     };
     const fuse = new Fuse(operations, options);
     const result = fuse.search(operation);
@@ -150,6 +151,16 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     else if (result.map((res) => res.item)[0] === 'add address') {
       speakWithCallback("okay.Tell Me Street or place name .", "hi-IN", () => {
         startSpeechRecognition('street');
+      });
+    }
+    else if (result.map((res) => res.item)[0] === 'Checkout') {
+      speakWithCallback("Conferm To Place Order. say yes conferm no cancel  .", "hi-IN", () => {
+        startSpeechRecognition('checkoutconferm');
+      });
+    }
+    else if (result.map((res) => res.item)[0] === 'Order Status') {
+      speakWithCallback("How Much Last Orders Status You Want to Know. Like! (zero one!zero two).", "hi-IN", () => {
+        startSpeechRecognition('checklastorderstatus');
       });
     }
     else if (result.map((res) => res.item)[0] === 'exit') {
@@ -239,20 +250,19 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   };
 
 
-  const [formData, setFormData] = useState({
-    firstname: Cookies.get('firstName'),
-    lastname: Cookies.get('lastName'),
-    email: Cookies.get('email'),
-    street: "",
-    city: "",
-    state: "",
-    postal_code: "",
-    country: "",
-    is_default: false,
-  });
-
   const handleSubmitAdressToSave = () => {
-    console.log(formData);
+    const formData = ({
+      firstname: Cookies.get('firstName'),
+      lastname: Cookies.get('lastName'),
+      email: Cookies.get('email'),
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      postal_code: address.postcode,
+      country: address.country,
+      is_default: false,
+    });
+    console.log(formData.country);
     axios.post(`${process.env.REACT_APP_domain}food/user/Profile.php`, formData)
       .then((response) => {
         const APIResponse = response.data; // This is the response data from AXIOS
@@ -266,31 +276,160 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         setSpinner(0); // Stop spinner on error
       });
   }
+  function checkoutConferm(result) {
+    const lowerConfirm = result.trim().toLowerCase();
+    if (["yes", "confirm"].some(word => lowerConfirm.includes(word))) {
+      speakWithCallback(` Wait! I am Placing Your Order.`, "hi-IN", () => {
+        checkout();
+      });
+    } else if (["no", "cancel"].some(word => lowerConfirm.includes(word))) {
+      speakWithCallback(`okay. The Order Place Is Cancel.`, "hi-IN", () => {
+        window.location.reload();
+      });
+    }
+  }
+  const checkout = async () => {
+    /// the same checkout fucntion is in App  components for simple people
+    // Get user details from cookies
+    const firstname = Cookies.get("firstName");
+    const lastname = Cookies.get("lastName");
+    const email = Cookies.get("email");
+
+    // Check if values are available
+    if (!firstname || !lastname || !email) {
+      toast.error("User details not found!");
+      speakWithCallback(`User details not found Please Login Repeat.`, "hi-IN", () => {
+        Cookies.remove('email');
+        Cookies.remove('userId');
+        Cookies.remove('firstName');
+        Cookies.remove('lastName');
+        Cookies.remove('isBlind');
+        Cookies.remove('isProfileSet');
+        navigate('./');
+        window.location.reload();
+      });
+      return;
+    }
+
+    if (cart?.reduce((acc, item) => acc + item.qty, 0)) {
+      try {
+        // Make the API request
+        const response = await axios.post(`${process.env.REACT_APP_domain}food/user/addOrder.php`, {
+          firstname,
+          lastname,
+          email
+        }, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("Order Response:", response.data);
+
+        if (response.data.success) {
+          clearCart();
+          const convertToText = (number) => {
+            let result = number.toString().split('').map(num =>
+              num === '0' ? 'zero' :num === '1' ? 'one':num === '2' ? 'two':num === '3' ? 'three':num === '4' ? 'four':num === '5' ? 'five':num === '6' ? 'six':num === '7' ? 'seven':num === '8' ? 'eight':num === '9' ? 'nine':''
+            ).join(' ');
+            return result;
+          }
+          toast.success(`Order placed successfully! Order ID: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
+          speakWithCallback(`Order placed successfully! Order ID: ${convertToText(response.data.order_id)}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`, "hi-IN", () => {
+            window.location.reload();
+          });
+        } else {
+          toast.error(`Error: ${response.data.error}`);
+          speakWithCallback(`Sorry! ${response.data.error}`, "hi-IN", () => {
+            window.location.reload();
+          });
+        }
+      } catch (error) {
+        console.error("Error placing order:", error);
+        alert("Failed to place order. Please try again.");
+      }
+
+    }
+    else {
+      speakWithCallback(`Sorry! Your Cart Is Empty Please Add Items In cart.}`, "hi-IN", () => {
+        start();
+      });
+      toast.warning("Your Cart Is Empty, Please Add The items in cart.");
+    }
+
+  }
+
+  const checkStatusOfLastOrders = (numbersoforders) => {
+
+    const firstname = Cookies.get('firstName');
+    const lastname = Cookies.get('lastName');
+    const email = Cookies.get('email');
+    let limit = parseInt(numbersoforders);
+    if (limit <= 0) {
+      limit = 2;
+    }
+    console.log(limit);
+    if (!firstname || !lastname || !email) {
+      speakWithCallback(`Sorry! Missing user information.`, "hi-IN", () => {
+        window.location.reload();
+      });
+      return;
+    }
+    speakWithCallback(`Wait! I am Getting the Orders Details.}`, "hi-IN", async () => {
+      try {
+        // Make a POST request to the PHP API with the cookie data
+        const response = await axios.post(`${process.env.REACT_APP_domain}food/user/getOrdersDetail.php`, {
+          firstname,
+          lastname,
+          email,
+          limit
+        });
+
+        // Log the response and update the state with orders
+        console.log('API Response:', response.data);
+
+        if (response.data.success) {
+          console.log(response.data.orders); // Assuming orders are in the "orders" field
+          let speechText = `Your Last ${response.data.orders.length} Orders:`;
+          const convertToText = (number) => {
+            let result = number.toString().split('').map(num =>
+              num === '0' ? 'zero' :num === '1' ? 'one':num === '2' ? 'two':num === '3' ? 'three':num === '4' ? 'four':num === '5' ? 'five':num === '6' ? 'six':num === '7' ? 'seven':num === '8' ? 'eight':num === '9' ? 'nine':''
+            ).join(' ');
+            return result;
+          }
+
+     
+
+          response.data.orders.forEach((order, index) => {
+            speechText += `Order id! ${convertToText(order.order_id)},! Status ${order.status},! Total Price ₹${order.total_price}!.`;
+          });
+          speakWithCallback(speechText, "hi-IN", () => {
+            window.location.reload();
+          });
+        } else {
+
+        }
+      } catch (error) {
+        console.error('Error fetching user orders:', error);
+      }
+    });
+
+  };
+
+
 
   useEffect(() => {
-    setFormData({
-      firstname: Cookies.get('firstName'),
-      lastname: Cookies.get('lastName'),
-      email: Cookies.get('email'),
-      street: address.street,
-      city: address.city,
-      state: address.state,
-      postal_code: address.postcode,
-      country: address.country,
-      is_default: false,
-    });
     if (address.country.length > 0 && address.city.length > 0 && address.state.length > 0 && address.street.length > 0 && address.postcode.length > 0) {
-      handleSubmitAdressToSave();
       const spacedPostalCode = address.postcode
         .toString()
         .split("")
         .map(char => (char === '0' ? 'zero' : char === '1' ? 'one' : char === '2' ? 'two' : char === '3' ? 'three' : char === '4' ? 'four' : char === '5' ? 'five' : char === '6' ? 'six' : char === '7' ? 'seven' : char === '8' ? 'eight' : char === '9' ? 'nine' : char)) // Replace '0' with 'zero'
         .join("");
-      
+
       const addressSpeech = `Street, ${address.street}! City, ${address.city}! State, ${address.state}! Postal Code, ${spacedPostalCode}! Country, ${address.country}`;
       setAddress({ street: '', city: '', state: '', postcode: '', country: '' });
       speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Addresse Saved Successfull".`, "hi-IN", () => {
-        window.location.reload();
+        handleSubmitAdressToSave();
       });
 
     }
@@ -341,6 +480,8 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       else if (type === 'state') updateState(result);
       else if (type === 'postcode') updatePostcode(result);
       else if (type === 'country') updateCountry(result);
+      else if (type === 'checkoutconferm') checkoutConferm(result);
+      else if (type === 'checklastorderstatus') checkStatusOfLastOrders(result);
     };
 
     recognition.onerror = (event) => {
@@ -420,7 +561,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   const handleConfirmationofitem = (iteamconfirmation) => {
 
     const lowerConfirm = iteamconfirmation.trim().toLowerCase();
-    if (["yes", "correctt"].some(word => lowerConfirm.includes(word))) {
+    if (["yes", "correct"].some(word => lowerConfirm.includes(word))) {
 
 
       speakWithCallback(`okay. How much quantity would you like to add?`, "hi-IN", () => {
@@ -501,7 +642,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   const [isconfirm, setisconferm] = useState(0);
   useEffect(() => {
     if (isconfirm) {
-      speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemId} In your cart.`, "hi-IN");
+      speakWithCallback(`Successfully added ${add.qty} Qantity of ${add.itemName} In your cart.`, "hi-IN");
       addToCart(add.itemId, add.itemName, add.qty, add.itemPrice);
 
       setisconferm(0);

@@ -17,10 +17,9 @@ import Recomended from './components/Recomended';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Profile from './components/Profile';
+import UserOrders from './components/UserOrders';
 function App() {
-
   // cart 
-
   const [cartItems, setCartItems] = useState([]);
   const [flagDataget, setFlagDataGet] = useState(0);
   function fetchCartItems() {
@@ -35,7 +34,7 @@ function App() {
       withCredentials: true, // Ensure cookies are sent with the request
     })
       .then(response => {
-        setCartItems(response.data.cart);
+        setCartItems(response.data.cart?response.data.cart:[]);
         setFlagDataGet(1);
       })
       .catch(error => {
@@ -98,7 +97,43 @@ function App() {
     });
 
   };
+  const checkout = async () => {
+    try {                                                   /// the same checkout fucntion is in recomended components for the blind people
+      // Get user details from cookies
+      const firstname = Cookies.get("firstName");
+      const lastname = Cookies.get("lastName");
+      const email = Cookies.get("email");
+    
+      // Check if values are available
+      if (!firstname || !lastname || !email) {
+        alert("User details not found!");
+        return;
+      }
 
+      // Make the API request
+      const response = await axios.post(`${process.env.REACT_APP_domain}food/user/addOrder.php`, {
+        firstname,
+        lastname,
+        email
+      }, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("Order Response:", response.data);
+
+      if (response.data.success) {
+        toast.success(`Order placed successfully! Order ID: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
+        clearCart();
+      } else {
+        toast.error(`Error: ${response.data.error}`);
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("Failed to place order. Please try again.");
+    }
+  }
 
   useEffect(() => {
 
@@ -108,7 +143,7 @@ function App() {
     // eslint-disable-next-line
   }, [cartItems]);
 
- 
+
   useEffect(() => {
     fetchCartItems();
     // eslint-disable-next-line
@@ -119,12 +154,12 @@ function App() {
       <BrowserRouter>
 
         {
-          (parseInt(Cookies.get('admin')))?
+          (parseInt(Cookies.get('admin'))) ?
             <>  {/* Admin dashboard */}
               <AdminNav />
               <h1 className='mt-[200px]'>This is addmin panel</h1>
               <Routes>
-      
+
 
 
               </Routes>
@@ -132,11 +167,12 @@ function App() {
             :
             (parseInt(Cookies.get('userId'))) ?
               <>  {/* user dashboard */}
-                <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} />
+                <TaskBar cartItems={cartItems} setCartItemsfunction={setCartItemsfunction} saveCartData={saveCartData} checkout={checkout} />
 
                 <Routes>
                   <Route path="/" element={<Recomended addToCart={addToCart} clearCart={clearCart} cart={cartItems} />} />
                   <Route path="/address" element={<Profile />} />
+                  <Route path="/orders" element={<UserOrders/>}/>
                 </Routes>
               </>
               :
