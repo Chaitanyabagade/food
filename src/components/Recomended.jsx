@@ -121,9 +121,11 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
-  const operations = ['add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
+  const operationsSayToUser = ['add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
+  const operations =['add to cart', 'clear cart', 'check cart items','check cart details','cart details', 'add address','update address','change address', 'Checkout','Placeorder','place order', 'Order Status','Check Order Status', 'exit','stop'];
+ 
   const SpeakMenuList = () => {
-    const speechtext = operations.map((item, index) => `${index + 1}! ${item} !! `).join(',');
+    const speechtext = operationsSayToUser.map((item, index) => `${index + 1}! ${item} !! `).join(',');
     speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
       startSpeechRecognition("operation");
     });
@@ -132,38 +134,42 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
     const options = {
       includeScore: true,
-      threshold: 0.5,
+      threshold: 0.3,
     };
     const fuse = new Fuse(operations, options);
     const result = fuse.search(operation);
+
+
     console.log("operation detected=>", result.map((res) => res.item)[0]);
     if (result.map((res) => res.item)[0] === 'add to cart') {
       console.log("adding to cart");
       startAddToCart();
     }
-    else if (result.map((res) => res.item)[0] === 'clear cart') {
-      clearCart();
-      speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN");
-    }
-    else if (result.map((res) => res.item)[0] === 'check cart items') {
+    else if (result.map((res) => res.item)[0] === 'check cart items' || result.map((res) => res.item)[0] === 'check cart details' || result.map((res) => res.item)[0] === 'cart details') {
       speakCartDetails();
     }
-    else if (result.map((res) => res.item)[0] === 'add address') {
+    else if (result.map((res) => res.item)[0] === 'add address' || result.map((res) => res.item)[0] === 'update address' || result.map((res) => res.item)[0] === 'change address') {
       speakWithCallback("okay.Tell Me Street or place name .", "hi-IN", () => {
         startSpeechRecognition('street');
       });
     }
-    else if (result.map((res) => res.item)[0] === 'Checkout') {
+    else if (result.map((res) => res.item)[0] === 'Checkout' || result.map((res) => res.item)[0] === 'place order' || result.map((res) => res.item)[0] === 'Placeorder') {
       speakWithCallback("Conferm To Place Order. say yes conferm no cancel  .", "hi-IN", () => {
         startSpeechRecognition('checkoutconferm');
       });
     }
-    else if (result.map((res) => res.item)[0] === 'Order Status') {
+    else if (result.map((res) => res.item)[0] === 'Order Status' || result.map((res) => res.item)[0] === 'Check Order Status') {
       speakWithCallback("How Much Last Orders Status You Want to Know. Like! (zero one!zero two).", "hi-IN", () => {
         startSpeechRecognition('checklastorderstatus');
       });
     }
-    else if (result.map((res) => res.item)[0] === 'exit') {
+    else if (result.map((res) => res.item)[0] === 'clear cart') {
+      clearCart();
+      speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN",()=>{
+         start();
+      });
+    }
+    else if (result.map((res) => res.item)[0] === 'exit'||result.map((res) => res.item)[0] === 'stop') {
       speakWithCallback("okay If you want anything, then click on center button.", "hi-IN");
     }
     else {
@@ -185,7 +191,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
   const speakCartDetails = () => {
     if (cart.length === 0) {
-      speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN");
+      speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN",()=>{
+        start();
+      });
       return;
     }
     const itemsDescription = cart
@@ -194,7 +202,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     const totalDescription = `Total items:! ${totalItems}.! Total price:! ${totalPrice} rupees.!`;
 
     const speechText = `Your cart contains: ${itemsDescription}. ${totalDescription}`;
-    speakWithCallback(`${speechText}`, "en-IN");
+    speakWithCallback(`${speechText}`, "en-IN",()=>{
+       start();
+    });
   };
 
   ////////////add address ///////
@@ -268,6 +278,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         const APIResponse = response.data; // This is the response data from AXIOS
         toast.success(APIResponse.message || 'Success!'); // Safely access message in response
         console.log(APIResponse);
+        window.location.reload();
       })
       .catch(error => {
         // Check if error is a response object (for HTTP errors), or a request/network error
@@ -330,7 +341,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           clearCart();
           const convertToText = (number) => {
             let result = number.toString().split('').map(num =>
-              num === '0' ? 'zero' :num === '1' ? 'one':num === '2' ? 'two':num === '3' ? 'three':num === '4' ? 'four':num === '5' ? 'five':num === '6' ? 'six':num === '7' ? 'seven':num === '8' ? 'eight':num === '9' ? 'nine':''
+              num === '0' ? 'zero' : num === '1' ? 'one' : num === '2' ? 'two' : num === '3' ? 'three' : num === '4' ? 'four' : num === '5' ? 'five' : num === '6' ? 'six' : num === '7' ? 'seven' : num === '8' ? 'eight' : num === '9' ? 'nine' : ''
             ).join(' ');
             return result;
           }
@@ -393,18 +404,18 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           let speechText = `Your Last ${response.data.orders.length} Orders:`;
           const convertToText = (number) => {
             let result = number.toString().split('').map(num =>
-              num === '0' ? 'zero' :num === '1' ? 'one':num === '2' ? 'two':num === '3' ? 'three':num === '4' ? 'four':num === '5' ? 'five':num === '6' ? 'six':num === '7' ? 'seven':num === '8' ? 'eight':num === '9' ? 'nine':''
+              num === '0' ? 'zero' : num === '1' ? 'one' : num === '2' ? 'two' : num === '3' ? 'three' : num === '4' ? 'four' : num === '5' ? 'five' : num === '6' ? 'six' : num === '7' ? 'seven' : num === '8' ? 'eight' : num === '9' ? 'nine' : ''
             ).join(' ');
             return result;
           }
 
-     
+
 
           response.data.orders.forEach((order, index) => {
             speechText += `Order id! ${convertToText(order.order_id)},! Status ${order.status},! Total Price ₹${order.total_price}!.`;
           });
           speakWithCallback(speechText, "hi-IN", () => {
-            window.location.reload();
+            start();
           });
         } else {
 
@@ -545,7 +556,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           });
         }
         else {
-          speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes correct, or No Incorrect.`, "hi-IN", () => {
+          speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes right, or No wrong.`, "hi-IN", () => {
             startSpeechRecognition('iteamconfirmation');
           });
         }
@@ -561,20 +572,18 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   const handleConfirmationofitem = (iteamconfirmation) => {
 
     const lowerConfirm = iteamconfirmation.trim().toLowerCase();
-    if (["yes", "correct"].some(word => lowerConfirm.includes(word))) {
-
-
+    if (["yes", "right"].some(word => lowerConfirm.includes(word))) {
       speakWithCallback(`okay. How much quantity would you like to add?`, "hi-IN", () => {
         startSpeechRecognition("quantity");
       });
-    } else if (lowerConfirm.includes("no")) {
+    } else if (["no", "wrong"].some(word => lowerConfirm.includes(word))) {
       setCurrentOrder(prevOrder => ({
         ...prevOrder,
         itemId: ""
       }));
 
       speakWithCallback("Okay, let's try again. What would you like to add in cart?", "hi-IN", () => {
-        startSpeechRecognition("order");
+        startSpeechRecognition("addToCart");
       });
     } else {
 
