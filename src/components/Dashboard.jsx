@@ -40,7 +40,7 @@ const Dashboard = () => {
          setFirstTime(firsttime + 1);
         
        } else {
-         speakWithCallback(`New Order is received! order id ${newId} `, "hi-IN", () => {
+         speakWithCallback(`New Order is received! order eye-dee ${newId} `, "hi-IN", () => {
          
          });
        }

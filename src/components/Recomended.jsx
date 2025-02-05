@@ -347,7 +347,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
             ).join(' ');
             return result;
           }
-          toast.success(`Order placed successfully! Order ID: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
+          toast.success(`Order placed successfully! Order eye-dee: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
           speakWithCallback(`Order placed successfully! Order ID: ${convertToText(response.data.order_id)}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`, "hi-IN", () => {
            start();
           });
