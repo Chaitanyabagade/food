@@ -550,7 +550,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         if (response.data.error === 'No matching item found') {
           speakWithCallback(`Sorry! the Item ${item} is not found so Say correct item name or try another.`, "hi-IN", () => {
             speakWithCallback(`What would you want to add to cart.`, "hi-IN", () => {
-              startSpeechRecognition("order");
+              startSpeechRecognition("addToCart");
               setisconferm(0);
             });
           });
