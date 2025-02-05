@@ -170,7 +170,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       });
     }
     else if (result.map((res) => res.item)[0] === 'exit'||result.map((res) => res.item)[0] === 'stop') {
-      speakWithCallback("okay If you want anything, then click on center button.", "hi-IN");
+      speakWithCallback("okay If you want anything, then click on center button.", "hi-IN",()=>{
+         setIsStarted(0);
+      });
     }
     else {
       speakWithCallback("Sorry! I Don't Found Operation Please Say Correct Operation Name", "hi-IN", () => {
