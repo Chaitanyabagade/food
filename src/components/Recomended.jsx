@@ -347,7 +347,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           }
           toast.success(`Order placed successfully! Order ID: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
           speakWithCallback(`Order placed successfully! Order ID: ${convertToText(response.data.order_id)}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`, "hi-IN", () => {
-            window.location.reload();
+           start();
           });
         } else {
           toast.error(`Error: ${response.data.error}`);
@@ -556,7 +556,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           });
         }
         else {
-          speakWithCallback(`You want ${response.data.name}.and the item Price is ${response.data.price} Rupees Is this correct? Say Yes right, or No wrong.`, "hi-IN", () => {
+          speakWithCallback(`You want ${response.data.name} and the item Price is ${response.data.price} Rupees Is this correct? Say Yes right, or No wrong.`, "hi-IN", () => {
             startSpeechRecognition('iteamconfirmation');
           });
         }
@@ -627,7 +627,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
 
         speakWithCallback(
-          `You want to add ${number} of ${updatedOrder.itemId}. Do you want to confirm? Say yes confirm or no cancel.`,
+          `You want to add ${number} of ${updatedOrder.itemId} Do you want to confirm? Say yes confirm or no cancel.`,
           "hi-IN",
           () => {
             // Update `add` only after confirmation
