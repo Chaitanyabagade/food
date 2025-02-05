@@ -36,7 +36,7 @@ const Dashboard = () => {
      };
    
      useEffect(() => {
-       if (newId <= 0 || firsttime === 0 || firsttime === 1) {
+       if (newId <= 0 || firsttime === 0 ) {
          setFirstTime(firsttime + 1);
         
        } else {
@@ -48,7 +48,7 @@ const Dashboard = () => {
      }, [newId]);
     useEffect(() => {
         fetchOrders();
-        setInterval(fetchOrders, 10000);
+        setInterval(fetchOrders, 5000);
         // eslint-disable-next-line
     }, []);
 
