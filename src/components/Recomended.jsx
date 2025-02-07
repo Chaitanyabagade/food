@@ -121,14 +121,96 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
-  const operationsSayToUser = ['add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
-  const operations =['add to cart', 'clear cart', 'check cart items','check cart details','cart details', 'add address','update address','change address', 'Checkout','Placeorder','place order', 'Order Status','Check Order Status', 'exit','stop'];
- 
+  const operationsSayToUser = ['check menu items', 'add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
+  const operations = ['check menu items', 'check menu item', 'check menu', 'add to cart', 'clear cart', 'check cart items', 'check cart details', 'cart details', 'add address', 'update address', 'change address', 'Checkout', 'Placeorder', 'place order', 'Order Status', 'Check Order Status', 'exit', 'stop'];
+
   const SpeakMenuList = () => {
     const speechtext = operationsSayToUser.map((item, index) => `${index + 1}! ${item} !! `).join(',');
     speakWithCallback(`${speechtext}. Please Tell me which operation you want to do?`, "eh-IN", () => {
       startSpeechRecognition("operation");
     });
+  }
+  const speakMenuItemsCategory = () => {
+    const categories = [...new Set(menuItems.map(item => item.category))];
+    let speechtext = [`Okay, We having the total ${categories.length} Category !`];
+   
+    categories.map(categorie => {
+      speechtext = speechtext + `${categorie}!`;
+      return 1;
+    });
+    speakWithCallback(`${speechtext}! Which category items you want to know?`, "hi-IN", () => {
+      startSpeechRecognition('categoryformenu');
+    });
+  }
+  const speakMenuItemsCategoryItems=(categoryToSpeak)=>{    
+    let speechParts = [`Okay, The ${categoryToSpeak} Items Are `];
+  
+    // Filter items based on the selected category
+    const filteredItems = menuItems.filter(item => item.category === categoryToSpeak);
+
+    if (filteredItems.length === 0) {
+      speechParts.push(`Sorry, no items found in the ${categoryToSpeak} category!`);
+    } else {
+      filteredItems.forEach(item => {
+        speechParts.push(`${item.name}`);  // Hindi part
+        speechParts.push(`Price is ${item.price}`); // English part
+      });
+    }
+
+
+    // Function to speak text parts with different languages
+    const speakInChunks = (parts, callback) => {
+      const synth = window.speechSynthesis;
+      let index = 0;
+
+      const speakNext = () => {
+        if (index < parts.length) {
+          const utterance = new SpeechSynthesisUtterance(parts[index]);
+
+          // Use Hindi for item names and English for prices
+          if (parts[index].includes("Price is")) {
+            utterance.lang = "en-US"; // English for prices
+          } else {
+            utterance.lang = "hi-IN"; // Hindi for item names
+          }
+
+          utterance.onend = () => {
+            index++;
+            speakNext(); // Move to the next part
+          };
+
+          synth.speak(utterance);
+        } else if (callback) {
+          callback(); // Call the callback after speaking all chunks
+        }
+      };
+
+      speakNext();
+    };
+
+    // Speak filtered menu items in correct languages
+    speakInChunks(speechParts, () => {
+      start();
+    });
+  }
+
+  const speakTheMenuOfCategory = (cat) => {
+    const categories = [...new Set(menuItems.map(item => item.category))];
+    const options = {
+      includeScore: true,
+      threshold: 0.3,
+    };
+    const fuse = new Fuse(categories, options);
+    const result = fuse.search(cat);
+    if (result.map((res) => res.item)[0]) {
+      speakMenuItemsCategoryItems(result.map((res) => res.item)[0]);
+    }
+    else {
+      speakWithCallback(`Sorry Please Repeat Which category items you want to know?`, "hi-IN", () => {
+        startSpeechRecognition('categoryformenu');
+      });
+    }
+
   }
   const handleOperation = (operation) => {
 
@@ -139,9 +221,11 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     const fuse = new Fuse(operations, options);
     const result = fuse.search(operation);
 
-
     console.log("operation detected=>", result.map((res) => res.item)[0]);
-    if (result.map((res) => res.item)[0] === 'add to cart') {
+    if (result.map((res) => res.item)[0] === 'check menu items' || result.map((res) => res.item)[0] === 'check menu item' || result.map((res) => res.item)[0] === 'check menu') {
+      speakMenuItemsCategory();
+    }
+    else if (result.map((res) => res.item)[0] === 'add to cart') {
       console.log("adding to cart");
       startAddToCart();
     }
@@ -165,13 +249,13 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
     else if (result.map((res) => res.item)[0] === 'clear cart') {
       clearCart();
-      speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN",()=>{
-         start();
+      speakWithCallback("Yes! the cart is Successfully cleared Now you can add the New item to card", "hi-IN", () => {
+        start();
       });
     }
-    else if (result.map((res) => res.item)[0] === 'exit'||result.map((res) => res.item)[0] === 'stop') {
-      speakWithCallback("okay If you want anything, then click on center button.", "hi-IN",()=>{
-         setIsStarted(0);
+    else if (result.map((res) => res.item)[0] === 'exit' || result.map((res) => res.item)[0] === 'stop') {
+      speakWithCallback("okay If you want anything, then click on center button.", "hi-IN", () => {
+        setIsStarted(0);
       });
     }
     else {
@@ -193,7 +277,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
   const speakCartDetails = () => {
     if (cart.length === 0) {
-      speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN",()=>{
+      speakWithCallback("Sorry! Your Cart Is Empty, Add Something in Cart.", "hi-IN", () => {
         start();
       });
       return;
@@ -204,8 +288,8 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     const totalDescription = `Total items:! ${totalItems}.! Total price:! ${totalPrice} rupees.!`;
 
     const speechText = `Your cart contains: ${itemsDescription}. ${totalDescription}`;
-    speakWithCallback(`${speechText}`, "en-IN",()=>{
-       start();
+    speakWithCallback(`${speechText}`, "en-IN", () => {
+      start();
     });
   };
 
@@ -349,7 +433,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
           }
           toast.success(`Order placed successfully! Order eye-dee: ${response.data.order_id}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`);
           speakWithCallback(`Order placed successfully! Order ID: ${convertToText(response.data.order_id)}! And You Have To Pay ${response.data.total_price},Rupees On Time OF Delivery`, "hi-IN", () => {
-           start();
+            start();
           });
         } else {
           toast.error(`Error: ${response.data.error}`);
@@ -495,6 +579,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       else if (type === 'country') updateCountry(result);
       else if (type === 'checkoutconferm') checkoutConferm(result);
       else if (type === 'checklastorderstatus') checkStatusOfLastOrders(result);
+      else if (type === 'categoryformenu') speakTheMenuOfCategory(result);
     };
 
     recognition.onerror = (event) => {
