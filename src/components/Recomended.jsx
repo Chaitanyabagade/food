@@ -364,7 +364,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         const APIResponse = response.data; // This is the response data from AXIOS
         toast.success(APIResponse.message || 'Success!'); // Safely access message in response
         console.log(APIResponse);
-        window.location.reload();
+        setTimeout(() => {
+           window.location.reload();
+        }, 5000); 
       })
       .catch(error => {
         // Check if error is a response object (for HTTP errors), or a request/network error
@@ -524,9 +526,10 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
         .join("");
 
       const addressSpeech = `Street, ${address.street}! City, ${address.city}! State, ${address.state}! Postal Code, ${spacedPostalCode}! Country, ${address.country}`;
+      handleSubmitAdressToSave();
       setAddress({ street: '', city: '', state: '', postcode: '', country: '' });
       speakWithCallback(`Okay Fine. Check once if the address is correct. ${addressSpeech}! Addresse Saved Successfull".`, "hi-IN", () => {
-        handleSubmitAdressToSave();
+         
       });
 
     }
