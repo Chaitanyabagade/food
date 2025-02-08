@@ -121,6 +121,12 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     }
   }
 
+  useEffect(()=>{
+    if(parseInt(Cookies.get('isBlind'))){
+      start();
+    }
+   // eslint-disable-next-line
+  },[]);
   const operationsSayToUser = ['check menu items', 'add to cart', 'clear cart', 'check cart items', 'add address', 'Checkout', 'Order Status', 'exit'];
   const operations = ['check menu items', 'check menu item', 'check menu', 'add to cart', 'clear cart', 'check cart items', 'check cart details', 'cart details', 'add address', 'update address', 'change address', 'Checkout', 'Placeorder', 'place order', 'Order Status', 'Check Order Status', 'exit', 'stop'];
 
@@ -133,7 +139,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
   const speakMenuItemsCategory = () => {
     const categories = [...new Set(menuItems.map(item => item.category))];
     let speechtext = [`Okay, We having the total ${categories.length} Category !`];
-   
+    
     categories.map(categorie => {
       speechtext = speechtext + `${categorie}!`;
       return 1;
@@ -190,7 +196,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
     // Speak filtered menu items in correct languages
     speakInChunks(speechParts, () => {
-      start();
+      startAddToCart();
     });
   }
 
@@ -220,7 +226,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
     };
     const fuse = new Fuse(operations, options);
     const result = fuse.search(operation);
-
+   
     console.log("operation detected=>", result.map((res) => res.item)[0]);
     if (result.map((res) => res.item)[0] === 'check menu items' || result.map((res) => res.item)[0] === 'check menu item' || result.map((res) => res.item)[0] === 'check menu') {
       speakMenuItemsCategory();
@@ -489,22 +495,43 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
         if (response.data.success) {
           console.log(response.data.orders); // Assuming orders are in the "orders" field
-          let speechText = `Your Last ${response.data.orders.length} Orders:`;
+
+          let speechTextChunks = [];
           const convertToText = (number) => {
-            let result = number.toString().split('').map(num =>
-              num === '0' ? 'zero' : num === '1' ? 'one' : num === '2' ? 'two' : num === '3' ? 'three' : num === '4' ? 'four' : num === '5' ? 'five' : num === '6' ? 'six' : num === '7' ? 'seven' : num === '8' ? 'eight' : num === '9' ? 'nine' : ''
+            return number.toString().split('').map(num =>
+              num === '0' ? 'zero' : num === '1' ? 'one' : num === '2' ? 'two' :
+              num === '3' ? 'three' : num === '4' ? 'four' : num === '5' ? 'five' :
+              num === '6' ? 'six' : num === '7' ? 'seven' : num === '8' ? 'eight' :
+              num === '9' ? 'nine' : ''
             ).join(' ');
-            return result;
-          }
-
-
-
+          };
+          
+          // Group orders into chunks of 2 to avoid long speech
+          const chunkSize = 2;
+          let chunk = [];
           response.data.orders.forEach((order, index) => {
-            speechText += `Order id! ${convertToText(order.order_id)},! Status ${order.status},! Total Price ₹${order.total_price}!.`;
+            let orderSpeech = `Order ID: ${convertToText(order.order_id)}. Status: ${order.status}. Total Price ₹${order.total_price}. `;
+            chunk.push(orderSpeech);
+          
+            if ((index + 1) % chunkSize === 0 || index === response.data.orders.length - 1) {
+              speechTextChunks.push(chunk.join(" "));
+              chunk = [];
+            }
           });
-          speakWithCallback(speechText, "hi-IN", () => {
-            start();
-          });
+          
+          // Function to speak each chunk sequentially
+          const speakChunksSequentially = (index = 0) => {
+            if (index < speechTextChunks.length) {
+              speakWithCallback(speechTextChunks[index], "hi-IN", () => {
+                speakChunksSequentially(index + 1);
+              });
+            } else {
+              start(); // Restart after speaking all chunks
+            }
+          };
+          
+          // Start speaking
+          speakChunksSequentially();
         } else {
 
         }
