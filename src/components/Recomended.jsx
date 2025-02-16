@@ -123,7 +123,9 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
 
   useEffect(()=>{
     if(parseInt(Cookies.get('isBlind'))){
-      start();
+      speakWithCallback("Click on Center button to start!", "hi-IN", () => {
+         console.log("started");
+      });
     }
    // eslint-disable-next-line
   },[]);
