@@ -8,7 +8,7 @@ const Contact = () => {
       <p className="text-gray-700 text-center mb-10 max-w-2xl">
         Get in touch with us for inquiries, support, or feedback about our Smart
         Agriculture solutions. We're here to help you maximize productivity and
-        embrace innovation in farming!
+        embrace innovation in Food Ordering!
       </p>
 
       {/* Profile Section */}
@@ -18,9 +18,9 @@ const Contact = () => {
           alt="Profile"
           className="w-32 h-32 rounded-full mx-auto border-4 border-green-200 shadow-lg"
         />
-        <h2 className="text-2xl font-semibold mt-4">Chaitanya Bagade</h2>
+        <h2 className="text-2xl font-semibold mt-4">Kaustubh Hande</h2>
         <p className="text-gray-600 mt-2">
-          Dedicated to bringing innovation to agriculture through technology.
+          Dedicated to bringing innovation to order food through technology.
         </p>
       </div>
 
@@ -28,18 +28,18 @@ const Contact = () => {
       <div className="mt-10 bg-white shadow-md rounded-lg max-w-lg w-full p-6">
         <h3 className="text-xl font-semibold text-green-800 mb-4">Contact Details</h3>
         <p className="text-gray-700">
-          <strong>Mobile:</strong> 9307084680
+          <strong>Mobile:</strong> 8530669372
         </p>
         <p className="text-gray-700">
-          <strong>Alternate Mobile:</strong> 8087472049
+          <strong>Alternate Mobile:</strong> 8530669372
         </p>
         <p className="text-gray-700">
           <strong>Email:</strong>{" "}
           <a
-            href="mailto:chaitanyabagade59@gmail.com"
+            href="mailto:fastfood@gamil.com"
             className="text-blue-500 underline"
           >
-            chaitanyabagade59@gmail.com
+            fastfood@gamil.com
           </a>
         </p>
         <p className="text-gray-700">
@@ -53,8 +53,8 @@ const Contact = () => {
         <p className="text-gray-700">
           Facing issues or need assistance? Contact our support team at:
         </p>
-        <p className="text-gray-700 font-medium mt-2">+91-1234567890</p>
-        <p className="text-gray-700 font-medium">support@smartagriculture.com</p>
+        <p className="text-gray-700 font-medium mt-2">+91-8530669372</p>
+        <p className="text-gray-700 font-medium">support@fastfood.com</p>
       </div>
 
       {/* Social Media Links */}

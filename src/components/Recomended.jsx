@@ -120,7 +120,7 @@ const Recomended = ({ addToCart, clearCart, cart }) => {
       });
     }
   }
-
+  
   useEffect(()=>{
     if(parseInt(Cookies.get('isBlind'))){
       speakWithCallback("Click on Center button to start!", "hi-IN", () => {
